@@ -8,17 +8,1029 @@
         content="Platform Edukasi Teknologi & Pemrograman Web Terintegrasi - Tugas UAS Pemrograman Web">
     <title>EdukasiTekno - Platform Edukasi Pemrograman Web</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts (gabungan kebutuhan seluruh section) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons (dipakai Section 2, 4, 5) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Custom CSS (Modular Master File) -->
-    <link rel="stylesheet" href="index.css">
+    <!-- Tailwind CSS CDN — WAJIB, dipakai oleh Section 1 (Hero About Us) & Section 3 (Video Blog) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+
+    <!-- Lucide Icons — dipakai oleh Section 3 (Video Blog) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Custom CSS (Modular Master File) — sebelumnya index.css terpisah, sekarang inline -->
+    <style>
+/* ==========================================================================
+   index.css
+   --------------------------------------------------------------------------
+   Styling untuk Section 2 (Materi Grid), Modal Detail, Section 4 (Tabel),
+   dan Section 5 (Placeholder Feedback). Section 1 (Hero) dan Section 3
+   (Video Blog) sudah full pakai Tailwind CDN, jadi tidak perlu class di
+   sini — supaya tidak dobel/bentrok.
+   ========================================================================== */
+
+:root {
+  --bg: #0B0D1B;
+  --surface: #131728;
+  --surface-2: #181C2E;
+  --border: #26304A;
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --primary: #6366F1;
+  --primary-dark: #4F46E5;
+  --primary-light: #818CF8;
+  --success: #34D399;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+}
+
+/* ==========================================================================
+   LIQUID GLASS INTERACTION SYSTEM
+   --------------------------------------------------------------------------
+   Cursor spotlight, floating glass orbs, card tilt/spotlight/reflection,
+   magnetic buttons, nav sliding indicator, scroll progress. Semua di-scope
+   supaya tidak mengubah struktur/konten, cuma menambah motion & depth.
+   Semua animasi berbasis transform/opacity/filter (GPU-friendly), dan
+   dimatikan otomatis lewat [data-reduced-motion] / [data-no-hover] yang
+   di-set oleh interactions.js.
+   ========================================================================== */
+
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 460px;
+  height: 460px;
+  margin-left: -230px;
+  margin-top: -230px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.16), transparent 70%);
+  pointer-events: none;
+  z-index: 40;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform;
+}
+
+body[data-reduced-motion="true"] .cursor-glow,
+body[data-no-hover="true"] .cursor-glow {
+  display: none;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.55);
+  z-index: 70;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Floating glass orbs — dekoratif, di belakang konten Section 2 & 4 */
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-orb--a { width: 300px; height: 300px; background: var(--primary); top: 6%; left: -80px; animation: orb-float-a 22s ease-in-out infinite; }
+.bg-orb--b { width: 240px; height: 240px; background: #38BDF8; bottom: 4%; right: -60px; animation: orb-float-b 28s ease-in-out infinite; }
+.bg-orb--c { width: 200px; height: 200px; background: #A78BFA; top: 35%; right: 12%; animation: orb-float-c 34s ease-in-out infinite; }
+
+@keyframes orb-float-a { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.06); } }
+@keyframes orb-float-b { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(24px) scale(0.96); } }
+@keyframes orb-float-c { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.04); } }
+
+body[data-reduced-motion="true"] .bg-orb {
+  animation: none;
+}
+
+.section-edukasi,
+.section-table {
+  position: relative;
+}
+
+.section-edukasi .container,
+.section-table .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Navbar sliding glass indicator (dipasang oleh interactions.js) */
+.nav-glass-indicator {
+  position: absolute;
+  z-index: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1), width 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Card tilt + spotlight + reflection sweep */
+.materi-card {
+  position: relative;
+  will-change: transform;
+}
+
+.materi-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.10), transparent 55%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.materi-card:hover::after {
+  opacity: 1;
+}
+
+.materi-card__image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.14) 45%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 700ms ease;
+  pointer-events: none;
+}
+
+.materi-card:hover .materi-card__image::before {
+  transform: translateX(120%);
+}
+
+body[data-reduced-motion="true"] .materi-card,
+body[data-no-hover="true"] .materi-card {
+  transform: none !important;
+}
+
+/* Press feedback — dideklarasikan setelah :hover supaya menang saat diklik */
+.btn:active,
+.about-btn:active,
+.cta-pill:active {
+  transform: scale(0.97);
+}
+
+/* Video player entrance (scale-in halus saat halaman dimuat) */
+.video-container-reveal {
+  animation: video-scale-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes video-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+body[data-reduced-motion="true"] .video-container-reveal {
+  animation: none;
+}
+
+@media (max-width: 768px) {
+  .bg-orb--c { display: none; }
+  .cursor-glow { display: none; }
+}
+
+
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 650ms cubic-bezier(0.16, 1, 0.3, 1), transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes row-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.materi-table tbody tr {
+  animation: row-fade-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .materi-table tbody tr {
+    animation: none;
+  }
+}
+
+* { box-sizing: border-box; }
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   SHARED: section header (dipakai Section 2 & 4)
+   ========================================================================== */
+
+.section-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--primary-light);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: clamp(28px, 3.6vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   SECTION 2: MATERI GRID (cards)
+   ========================================================================== */
+
+.section-edukasi {
+  padding: 96px 0;
+}
+
+.materi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Grid sendiri tidak perlu ikut fade/translate — cukup jadi trigger
+   (.is-visible) untuk animasi stagger tiap .materi-card di bawah. */
+.materi-grid[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.materi-grid .materi-card {
+  opacity: 0;
+}
+
+.materi-grid.is-visible .materi-card {
+  animation: card-fade-up 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.materi-grid.is-visible .materi-card:nth-child(1) { animation-delay: 0ms; }
+.materi-grid.is-visible .materi-card:nth-child(2) { animation-delay: 120ms; }
+.materi-grid.is-visible .materi-card:nth-child(3) { animation-delay: 240ms; }
+.materi-grid.is-visible .materi-card:nth-child(4) { animation-delay: 360ms; }
+.materi-grid.is-visible .materi-card:nth-child(5) { animation-delay: 480ms; }
+.materi-grid.is-visible .materi-card:nth-child(6) { animation-delay: 600ms; }
+
+@keyframes card-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .materi-grid .materi-card {
+    opacity: 1;
+  }
+  .materi-grid.is-visible .materi-card {
+    animation: none;
+  }
+}
+
+.materi-card {
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+  transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+.materi-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: 0 20px 44px -24px rgba(99, 102, 241, 0.5);
+}
+
+.materi-card__image {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.materi-card__image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.materi-card__badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.materi-card__icon {
+  position: relative;
+  z-index: 1;
+  font-size: 56px;
+  opacity: 0.9;
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.35));
+}
+
+.materi-card__body {
+  padding: 24px;
+}
+
+.materi-card__title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.35;
+}
+
+.materi-card__desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0;
+  min-height: 72px;
+}
+
+.materi-card__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+.materi-card__btn {
+  width: 100%;
+}
+
+/* ==========================================================================
+   SHARED: buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, border-color 200ms ease;
+}
+
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--primary-dark));
+  box-shadow: 0 8px 22px -8px rgba(99, 102, 241, 0.6);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(99, 102, 241, 0.75);
+}
+
+.btn-outline {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--border);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary-light);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ==========================================================================
+   MODAL DETAIL POPUP
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 8, 20, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+.modal-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-container {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 250ms ease;
+}
+
+.modal-overlay.is-open .modal-container {
+  transform: translateY(0) scale(1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(11, 13, 27, 0.7);
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+.modal-close-btn:hover {
+  background: var(--surface);
+  border-color: var(--primary-light);
+}
+
+.modal-header-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #1E293B, #0F172A);
+  display: block;
+}
+
+.modal-body {
+  padding: 28px;
+}
+
+.modal-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--primary-light);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.modal-description {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+
+.modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.modal-section-title i {
+  color: var(--primary-light);
+}
+
+.modal-syllabus-list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-syllabus-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.modal-syllabus-list i {
+  color: var(--success);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* ==========================================================================
+   SECTION 4: TABLE
+   ========================================================================== */
+
+.section-table {
+  padding: 96px 0;
+}
+
+.table-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.search-box:focus-within {
+  border-color: rgba(129, 140, 248, 0.6);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+.search-box i {
+  color: var(--text-muted);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  font-size: 14.5px;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.select-filter {
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.table-responsive-wrapper {
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.materi-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.materi-table thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.materi-table tbody td {
+  padding: 18px 20px;
+  font-size: 14.5px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(38, 48, 74, 0.6);
+}
+
+.materi-table tbody tr {
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.materi-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.materi-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-materi-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.table-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary-light);
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.table-price {
+  font-weight: 700;
+}
+
+.table-price--free {
+  color: var(--success);
+}
+
+.table-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.badge--pemula {
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge--menengah {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge--mahir {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================================================
+   SECTION 5: FEEDBACK PLACEHOLDER
+   ========================================================================== */
+
+#section-feedback {
+  padding: 96px 0;
+}
+
+.section-placeholder {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 48px 32px;
+  border-radius: 20px;
+  border: 1px dashed var(--border);
+  background: var(--surface);
+}
+
+.placeholder-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary-light);
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.section-placeholder h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.section-placeholder p {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.section-placeholder strong {
+  color: var(--text);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .materi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-edukasi,
+  .section-table,
+  #section-feedback {
+    padding: 64px 0;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-body {
+    padding: 22px;
+  }
+}
+
+    </style>
+
+    <!-- ==================================================================
+         Custom styles gabungan — sebelumnya tersebar di 2 dokumen terpisah
+         (Section 1 Hero & Section 3 Video Blog). Efek yang tadinya global
+         (html/body/body::before) sudah di-scope ke section masing-masing
+         supaya tidak bentrok/bocor ke Section 2, 4, dan 5.
+         ================================================================== -->
+    <style>
+        /* ---------- Section 1: Hero About Us ---------- */
+        #hero-bg-photo {
+            background:
+                radial-gradient(ellipse 900px 500px at 14% 20%, rgba(99, 102, 241, 0.35), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 85% 15%, rgba(56, 189, 248, 0.22), transparent 60%),
+                radial-gradient(ellipse 800px 600px at 50% 100%, rgba(129, 140, 248, 0.28), transparent 60%),
+                linear-gradient(135deg, #0f172a 0%, #0b1120 45%, #020617 100%);
+        }
+
+        #hero-bg-grid {
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+            background-size: 56px 56px;
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
+        }
+
+        @keyframes hero-fade-up {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes hero-fade-down {
+            from { opacity: 0; transform: translateY(-14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-animate { animation: hero-fade-up 800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .hero-fade-down { animation: hero-fade-down 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .hero-delay-1 { animation-delay: 80ms; }
+        .hero-delay-2 { animation-delay: 180ms; }
+        .hero-delay-3 { animation-delay: 280ms; }
+        .hero-delay-4 { animation-delay: 420ms; }
+        .hero-delay-5 { animation-delay: 520ms; }
+
+        .cta-arrow-circle { transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .cta-pill:hover .cta-arrow-circle { transform: rotate(45deg); }
+
+        #hero-illustration { transition: transform 400ms ease-out; }
+
+        .hero-twinkle {
+            animation: hero-twinkle-kf 3.4s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        .hero-twinkle:nth-child(2) { animation-delay: 0.4s; }
+        .hero-twinkle:nth-child(3) { animation-delay: 0.8s; }
+        .hero-twinkle:nth-child(4) { animation-delay: 1.2s; }
+        .hero-twinkle:nth-child(5) { animation-delay: 1.6s; }
+        .hero-twinkle:nth-child(6) { animation-delay: 2.0s; }
+        .hero-twinkle:nth-child(7) { animation-delay: 2.4s; }
+        .hero-twinkle:nth-child(8) { animation-delay: 2.8s; }
+        @keyframes hero-twinkle-kf {
+            0%, 100% { opacity: 0.35; }
+            50% { opacity: 1; }
+        }
+
+        .hero-flow-line { animation: hero-dash-kf 2.6s linear infinite; }
+        @keyframes hero-dash-kf { to { stroke-dashoffset: -20; } }
+
+        .hero-glow-pulse {
+            animation: hero-glow-kf 5s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        @keyframes hero-glow-kf {
+            0%, 100% { opacity: 0.10; transform: scale(1); }
+            50% { opacity: 0.22; transform: scale(1.06); }
+        }
+
+        .hero-float {
+            animation: hero-bob-kf 5s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        .hero-float-b { animation-delay: 1.1s; animation-duration: 5.6s; }
+        .hero-float-c { animation-delay: 2.2s; animation-duration: 4.6s; }
+        @keyframes hero-bob-kf {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-animate, .hero-fade-down { animation: none; opacity: 1; transform: none; }
+            .hero-twinkle, .hero-flow-line, .hero-glow-pulse, .hero-float { animation: none !important; }
+            #hero-illustration { transition: none !important; transform: none !important; }
+        }
+
+        /* ---------- Section 3: Video Blog ---------- */
+        /* Ambient glow di-scope ke #app-root (bukan body) supaya tidak bocor ke section lain */
+        #app-root {
+            position: relative;
+            z-index: 1;
+        }
+        #app-root::before {
+            content: '';
+            position: absolute;
+            top: -220px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 65%);
+            filter: blur(10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #app-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+        #app-root ::-webkit-scrollbar-track { background: #0B0D1B; }
+        #app-root ::-webkit-scrollbar-thumb { background: #26304A; border-radius: 999px; }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @keyframes vd-fade-up {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .vd-fade-up { animation: vd-fade-up 500ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .vd-fade-up { animation: none; opacity: 1; transform: none; }
+            .animate-ping { animation: none; }
+        }
+    </style>
 </head>
 
 <body>
@@ -26,434 +1038,184 @@
     <!-- ==========================================
          SECTION 1: ABOUT US (NABIL)
          ========================================== -->
- <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hero — About Us EdukasiTekno (Glassmorphism)</title>
+    <section class="hero-animate-root relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <!-- 1. BACKGROUND -->
+        <!--
+          Ilustrasi SVG custom (bukan foto) bertema "coding workspace" — dibuat
+          langsung dengan kode supaya mandiri, ringan, dan bebas isu hak cipta
+          gambar pihak ketiga. Kalau nanti ada foto workspace asli, tinggal ganti
+          seluruh blok <svg id="hero-illustration"> ini dengan:
+          <div class="absolute inset-0" style="background-image:url('/images/hero-workspace.jpg');
+               background-size:cover; background-position:center;"></div>
+        -->
+        <div id="hero-bg-photo" class="absolute inset-0"></div>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
-      },
-    },
-  };
-</script>
+        <svg id="hero-illustration" class="absolute inset-0 h-full w-full" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+                <radialGradient id="glowIndigo" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#818CF8" stop-opacity="0.55"/>
+                    <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1E2A4A"/>
+                    <stop offset="100%" stop-color="#0B1120"/>
+                </linearGradient>
+                <linearGradient id="panelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
+                </linearGradient>
+                <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="30"/>
+                </filter>
+            </defs>
 
-<style>
-  html, body { background: #020617; }
-  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+            <circle cx="420" cy="260" r="260" fill="url(#glowIndigo)" filter="url(#softBlur)"/>
+            <circle cx="1220" cy="620" r="300" fill="url(#glowCyan)" filter="url(#softBlur)"/>
+            <circle cx="1000" cy="180" r="200" fill="url(#glowIndigo)" filter="url(#softBlur)" opacity="0.6"/>
 
-  /* ------------------------------------------------------------
-     Stand-in "tech workspace" background: layered bokeh + faint
-     grid, built entirely in CSS so the component has no external
-     image dependency. Swap the <div id="hero-bg-photo"> below for
-     a real background-image (or <img>) whenever a workspace photo
-     is available — see the comment at that element.
-  ------------------------------------------------------------ */
-  #hero-bg-photo {
-    background:
-      radial-gradient(ellipse 900px 500px at 14% 20%, rgba(99,102,241,0.35), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 85% 15%, rgba(56,189,248,0.22), transparent 60%),
-      radial-gradient(ellipse 800px 600px at 50% 100%, rgba(129,140,248,0.28), transparent 60%),
-      linear-gradient(135deg, #0f172a 0%, #0b1120 45%, #020617 100%);
-  }
+            <g stroke="#818CF8" stroke-width="1.4" stroke-dasharray="4 6" opacity="0.45" fill="none">
+                <path class="hero-flow-line" d="M760 480 C 900 380, 1020 340, 1150 300"/>
+                <path class="hero-flow-line" d="M700 460 C 560 380, 460 330, 340 280" style="animation-delay:0.6s;"/>
+                <path class="hero-flow-line" d="M820 560 C 950 620, 1080 640, 1220 660" style="animation-delay:1.2s;"/>
+            </g>
 
-  #hero-bg-grid {
-    background-image:
-      linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px);
-    background-size: 56px 56px;
-    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
-    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
-  }
+            <g fill="#A5B4FC">
+                <circle class="hero-twinkle" cx="1150" cy="300" r="4"/>
+                <circle class="hero-twinkle" cx="340" cy="280" r="3.4"/>
+                <circle class="hero-twinkle" cx="1220" cy="660" r="4"/>
+                <circle class="hero-twinkle" cx="230" cy="520" r="3"/>
+                <circle class="hero-twinkle" cx="1340" cy="220" r="3"/>
+                <circle class="hero-twinkle" cx="980" cy="700" r="3.4"/>
+                <circle class="hero-twinkle" cx="150" cy="180" r="2.6"/>
+                <circle class="hero-twinkle" cx="1420" cy="500" r="2.6"/>
+            </g>
 
-  #hero-bg-lines {
-    background-image: repeating-linear-gradient(
-      100deg,
-      rgba(148, 163, 184, 0.05) 0px,
-      rgba(148, 163, 184, 0.05) 1px,
-      transparent 1px,
-      transparent 120px
-    );
-  }
+            <g transform="translate(1060,255)">
+                <g class="hero-float">
+                    <rect width="180" height="80" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
+                    <rect x="18" y="18" width="30" height="30" rx="9" fill="#6366F1" fill-opacity="0.35"/>
+                    <path d="M27 33L32 38L27 43M39 33L44 38L39 43" stroke="#C7D2FE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="60" y="24" width="96" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
+                    <rect x="60" y="40" width="70" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
+                </g>
+            </g>
 
-  @keyframes hero-fade-up {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+            <g transform="translate(160,230)">
+                <g class="hero-float hero-float-b">
+                    <rect width="180" height="80" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
+                    <circle cx="34" cy="40" r="15" fill="#38BDF8" fill-opacity="0.3"/>
+                    <circle cx="34" cy="35" r="5" fill="#BAE6FD"/>
+                    <path d="M22 50c2-6 6-8 12-8s10 2 12 8" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <rect x="60" y="24" width="100" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
+                    <rect x="60" y="40" width="76" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
+                </g>
+            </g>
 
-  @keyframes hero-fade-down {
-    from { opacity: 0; transform: translateY(-14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+            <g transform="translate(1130,610)">
+                <g class="hero-float hero-float-c">
+                    <rect width="190" height="76" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
+                    <circle cx="32" cy="38" r="15" fill="#34D399" fill-opacity="0.3"/>
+                    <path d="M25 38l5 5l10-11" stroke="#6EE7B7" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <rect x="58" y="22" width="106" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
+                    <rect x="58" y="38" width="80" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
+                </g>
+            </g>
 
-  .hero-animate { animation: hero-fade-up 800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .hero-fade-down { animation: hero-fade-down 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .hero-delay-1 { animation-delay: 80ms; }
-  .hero-delay-2 { animation-delay: 180ms; }
-  .hero-delay-3 { animation-delay: 280ms; }
-  .hero-delay-4 { animation-delay: 420ms; }
-  .hero-delay-5 { animation-delay: 520ms; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-animate, .hero-fade-down { animation: none; opacity: 1; transform: none; }
-  }
-
-  .cta-arrow-circle { transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
-  .cta-pill:hover .cta-arrow-circle { transform: rotate(45deg); }
-
-  /* ------------------------------------------------------------
-     Ambient illustration animation
-  ------------------------------------------------------------ */
-  #hero-illustration {
-    transition: transform 400ms ease-out;
-  }
-
-  .hero-twinkle {
-    animation: hero-twinkle-kf 3.4s ease-in-out infinite;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .hero-twinkle:nth-child(2) { animation-delay: 0.4s; }
-  .hero-twinkle:nth-child(3) { animation-delay: 0.8s; }
-  .hero-twinkle:nth-child(4) { animation-delay: 1.2s; }
-  .hero-twinkle:nth-child(5) { animation-delay: 1.6s; }
-  .hero-twinkle:nth-child(6) { animation-delay: 2.0s; }
-  .hero-twinkle:nth-child(7) { animation-delay: 2.4s; }
-  .hero-twinkle:nth-child(8) { animation-delay: 2.8s; }
-
-  @keyframes hero-twinkle-kf {
-    0%, 100% { opacity: 0.35; }
-    50% { opacity: 1; }
-  }
-
-  .hero-flow-line {
-    animation: hero-dash-kf 2.6s linear infinite;
-  }
-  @keyframes hero-dash-kf {
-    to { stroke-dashoffset: -20; }
-  }
-
-  .hero-glow-pulse {
-    animation: hero-glow-kf 5s ease-in-out infinite;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  @keyframes hero-glow-kf {
-    0%, 100% { opacity: 0.10; transform: scale(1); }
-    50% { opacity: 0.22; transform: scale(1.06); }
-  }
-
-  .hero-float {
-    animation: hero-bob-kf 5s ease-in-out infinite;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .hero-float-b { animation-delay: 1.1s; animation-duration: 5.6s; }
-  .hero-float-c { animation-delay: 2.2s; animation-duration: 4.6s; }
-  @keyframes hero-bob-kf {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-twinkle, .hero-flow-line, .hero-glow-pulse, .hero-float {
-      animation: none !important;
-    }
-    #hero-illustration { transition: none !important; transform: none !important; }
-  }
-</style>
-</head>
-
-<body class="bg-slate-950">
-
-<!-- ==================================================================
-     HERO SECTION — full viewport (100vh), glassmorphism, Sunrock-style
-     Namespace: semua class custom di luar utility Tailwind diawali "hero-"
-     ================================================================== -->
-<section class="relative flex min-h-screen w-full flex-col overflow-hidden">
-
-  <!-- 1. BACKGROUND -->
-  <!--
-    Ilustrasi SVG custom (bukan foto) bertema "coding workspace" —
-    dibuat langsung dengan kode supaya mandiri, ringan, dan bebas isu
-    hak cipta gambar pihak ketiga. Kalau nanti ada foto workspace asli,
-    tinggal ganti seluruh blok <svg id="hero-illustration"> ini dengan:
-    <div class="absolute inset-0" style="background-image:url('/images/hero-workspace.jpg');
-         background-size:cover; background-position:center;"></div>
-  -->
-  <div id="hero-bg-photo" class="absolute inset-0"></div>
-
-  <svg id="hero-illustration" class="absolute inset-0 h-full w-full" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <radialGradient id="glowIndigo" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#818CF8" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.4"/>
-        <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#1E2A4A"/>
-        <stop offset="100%" stop-color="#0B1120"/>
-      </linearGradient>
-      <linearGradient id="panelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
-      </linearGradient>
-      <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="30"/>
-      </filter>
-    </defs>
-
-    <!-- ambient glow blobs -->
-    <circle cx="420" cy="260" r="260" fill="url(#glowIndigo)" filter="url(#softBlur)"/>
-    <circle cx="1220" cy="620" r="300" fill="url(#glowCyan)" filter="url(#softBlur)"/>
-    <circle cx="1000" cy="180" r="200" fill="url(#glowIndigo)" filter="url(#softBlur)" opacity="0.6"/>
-
-    <!-- connecting lines (workspace <-> floating panels) -->
-    <g stroke="#818CF8" stroke-width="1.4" stroke-dasharray="4 6" opacity="0.45" fill="none">
-      <path class="hero-flow-line" d="M760 480 C 900 380, 1020 340, 1150 300"/>
-      <path class="hero-flow-line" d="M700 460 C 560 380, 460 330, 340 280" style="animation-delay:0.6s;"/>
-      <path class="hero-flow-line" d="M820 560 C 950 620, 1080 640, 1220 660" style="animation-delay:1.2s;"/>
-    </g>
-
-    <!-- floating particles -->
-    <g fill="#A5B4FC">
-      <circle class="hero-twinkle" cx="1150" cy="300" r="4"/>
-      <circle class="hero-twinkle" cx="340" cy="280" r="3.4"/>
-      <circle class="hero-twinkle" cx="1220" cy="660" r="4"/>
-      <circle class="hero-twinkle" cx="230" cy="520" r="3"/>
-      <circle class="hero-twinkle" cx="1340" cy="220" r="3"/>
-      <circle class="hero-twinkle" cx="980" cy="700" r="3.4"/>
-      <circle class="hero-twinkle" cx="150" cy="180" r="2.6"/>
-      <circle class="hero-twinkle" cx="1420" cy="500" r="2.6"/>
-    </g>
-
-    <!-- floating panel: "Web Development" -->
-    <g transform="translate(1060,255)">
-     <g class="hero-float">
-      <rect width="180" height="80" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
-      <rect x="18" y="18" width="30" height="30" rx="9" fill="#6366F1" fill-opacity="0.35"/>
-      <path d="M27 33L32 38L27 43M39 33L44 38L39 43" stroke="#C7D2FE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="60" y="24" width="96" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
-      <rect x="60" y="40" width="70" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
-     </g>
-    </g>
-
-    <!-- floating panel: "Komunitas" -->
-    <g transform="translate(160,230)">
-     <g class="hero-float hero-float-b">
-      <rect width="180" height="80" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
-      <circle cx="34" cy="40" r="15" fill="#38BDF8" fill-opacity="0.3"/>
-      <circle cx="34" cy="35" r="5" fill="#BAE6FD"/>
-      <path d="M22 50c2-6 6-8 12-8s10 2 12 8" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round" fill="none"/>
-      <rect x="60" y="24" width="100" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
-      <rect x="60" y="40" width="76" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
-     </g>
-    </g>
-
-    <!-- floating panel: "Portfolio ready" -->
-    <g transform="translate(1130,610)">
-     <g class="hero-float hero-float-c">
-      <rect width="190" height="76" rx="18" fill="url(#panelGrad)" stroke="#ffffff" stroke-opacity="0.18"/>
-      <circle cx="32" cy="38" r="15" fill="#34D399" fill-opacity="0.3"/>
-      <path d="M25 38l5 5l10-11" stroke="#6EE7B7" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <rect x="58" y="22" width="106" height="8" rx="4" fill="#E0E7FF" fill-opacity="0.65"/>
-      <rect x="58" y="38" width="80" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.55"/>
-     </g>
-    </g>
-
-    <!-- laptop -->
-    <g transform="translate(560,380)">
-      <!-- base -->
-      <path d="M0 300 L360 300 L330 330 L30 330 Z" fill="#1E293B" stroke="#334155"/>
-      <rect x="150" y="300" width="60" height="6" rx="2" fill="#0F172A"/>
-      <!-- screen frame -->
-      <rect x="20" y="0" width="320" height="300" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
-      <!-- screen -->
-      <rect x="36" y="16" width="288" height="268" rx="6" fill="url(#screenGrad)"/>
-      <!-- code lines -->
-      <g opacity="0.95">
-        <rect x="54" y="40" width="70" height="7" rx="3.5" fill="#818CF8"/>
-        <rect x="130" y="40" width="40" height="7" rx="3.5" fill="#6EE7B7"/>
-        <rect x="54" y="60" width="110" height="7" rx="3.5" fill="#94A3B8" opacity="0.7"/>
-        <rect x="70" y="80" width="90" height="7" rx="3.5" fill="#38BDF8" opacity="0.85"/>
-        <rect x="70" y="100" width="60" height="7" rx="3.5" fill="#818CF8" opacity="0.7"/>
-        <rect x="54" y="120" width="130" height="7" rx="3.5" fill="#94A3B8" opacity="0.6"/>
-        <rect x="70" y="140" width="100" height="7" rx="3.5" fill="#F472B6" opacity="0.7"/>
-        <rect x="70" y="160" width="80" height="7" rx="3.5" fill="#6EE7B7" opacity="0.75"/>
-        <rect x="54" y="180" width="150" height="7" rx="3.5" fill="#94A3B8" opacity="0.5"/>
-        <rect x="54" y="200" width="60" height="7" rx="3.5" fill="#818CF8" opacity="0.8"/>
-      </g>
-      <!-- glow under screen -->
-      <ellipse class="hero-glow-pulse" cx="180" cy="150" rx="170" ry="150" fill="#6366F1" filter="url(#softBlur)"/>
-    </g>
-  </svg>
-
-  <div id="hero-bg-grid" class="absolute inset-0"></div>
-
-  <!-- Dark overlay for contrast -->
-  <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/60 to-slate-950/90"></div>
-  <div class="absolute inset-0 bg-slate-950/20"></div>
-
-  <!-- 2. FLOATING CAPSULE NAVBAR -->
-  <div class="relative z-20 flex justify-center px-4 pt-6 md:pt-8 hero-fade-down">
-    <nav class="flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 backdrop-blur-xl md:px-6">
-
-      <a href="#" class="flex items-center gap-2 text-[15px] font-extrabold tracking-tight text-white">
-        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-black">
-          E
-        </span>
-        EdukasiTekno
-      </a>
-
-      <div class="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
-        <a href="#" class="transition hover:text-white">Home</a>
-        <a href="#" class="transition hover:text-white">Katalog</a>
-        <a href="#" class="text-white">Tentang Kami</a>
-        <a href="#" class="transition hover:text-white">Kontak</a>
-      </div>
-
-      <a href="#"
-         class="rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-slate-200 md:px-5 md:text-sm">
-        Masuk
-      </a>
-    </nav>
-  </div>
-
-  <!-- 3. MAIN HERO CONTENT -->
-  <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-14 text-center md:py-16">
-
-    <h1 class="hero-animate hero-delay-1 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[68px]">
-      Membangun Generasi Talenta Digital Indonesia
-    </h1>
-
-    <p class="hero-animate hero-delay-2 mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">
-      Kami menghubungkan potensi anak bangsa dengan keterampilan teknologi
-      yang relevan, mentor dari industri, dan jalur nyata menuju karier digital.
-    </p>
-
-    <a href="#section-edukasi"
-       class="cta-pill hero-animate hero-delay-3 group mt-10 inline-flex items-center gap-4 rounded-full border border-white/20 bg-white/10 py-2 pl-6 pr-2 backdrop-blur-md transition hover:bg-white/15">
-      <span class="text-sm font-semibold text-white md:text-base">Daftar Materi Edukasi Terpopuler</span>
-      <span class="cta-arrow-circle flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-950">
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <g transform="translate(560,380)">
+                <path d="M0 300 L360 300 L330 330 L30 330 Z" fill="#1E293B" stroke="#334155"/>
+                <rect x="150" y="300" width="60" height="6" rx="2" fill="#0F172A"/>
+                <rect x="20" y="0" width="320" height="300" rx="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+                <rect x="36" y="16" width="288" height="268" rx="6" fill="url(#screenGrad)"/>
+                <g opacity="0.95">
+                    <rect x="54" y="40" width="70" height="7" rx="3.5" fill="#818CF8"/>
+                    <rect x="130" y="40" width="40" height="7" rx="3.5" fill="#6EE7B7"/>
+                    <rect x="54" y="60" width="110" height="7" rx="3.5" fill="#94A3B8" opacity="0.7"/>
+                    <rect x="70" y="80" width="90" height="7" rx="3.5" fill="#38BDF8" opacity="0.85"/>
+                    <rect x="70" y="100" width="60" height="7" rx="3.5" fill="#818CF8" opacity="0.7"/>
+                    <rect x="54" y="120" width="130" height="7" rx="3.5" fill="#94A3B8" opacity="0.6"/>
+                    <rect x="70" y="140" width="100" height="7" rx="3.5" fill="#F472B6" opacity="0.7"/>
+                    <rect x="70" y="160" width="80" height="7" rx="3.5" fill="#6EE7B7" opacity="0.75"/>
+                    <rect x="54" y="180" width="150" height="7" rx="3.5" fill="#94A3B8" opacity="0.5"/>
+                    <rect x="54" y="200" width="60" height="7" rx="3.5" fill="#818CF8" opacity="0.8"/>
+                </g>
+                <ellipse class="hero-glow-pulse" cx="180" cy="150" rx="170" ry="150" fill="#6366F1" filter="url(#softBlur)"/>
+            </g>
         </svg>
-      </span>
-    </a>
 
-  </div>
+        <div id="hero-bg-grid" class="absolute inset-0"></div>
 
-  <!-- 4. BOTTOM FLOATING GLASS CARDS -->
-  <!-- Mobile: stacked normally in-flow. Desktop (lg+): floating absolute at corners. -->
-  <div class="relative z-10 flex flex-col gap-4 px-6 pb-8 md:px-8 md:pb-10 lg:block lg:px-0">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/60 to-slate-950/90"></div>
+        <div class="absolute inset-0 bg-slate-950/20"></div>
 
-    <!-- LEFT CARD — Visi & Misi -->
-    <div class="hero-animate hero-delay-4 w-full rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-white/[0.14] lg:absolute lg:bottom-10 lg:left-10 lg:w-[340px]">
-      <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-200">
-        Visi &amp; Misi
-      </span>
-      <p class="mt-4 text-sm leading-relaxed text-slate-200">
-        <span class="font-semibold text-white">Visi:</span> Menjadi ruang belajar teknologi
-        paling relevan bagi talenta Indonesia.
-      </p>
-      <p class="mt-2 text-sm leading-relaxed text-slate-200">
-        <span class="font-semibold text-white">Misi:</span> Menyediakan kurikulum praktis,
-        mentor industri, dan komunitas yang mendukung pertumbuhan nyata.
-      </p>
-    </div>
-
-    <!-- RIGHT CARD — Statistik & Dampak -->
-    <div class="hero-animate hero-delay-5 w-full rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-white/[0.14] lg:absolute lg:bottom-10 lg:right-10 lg:w-[340px]">
-      <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-200">
-        Statistik &amp; Dampak
-      </span>
-      <div class="mt-4 grid grid-cols-3 gap-3 text-center">
-        <div>
-          <div class="text-lg font-extrabold text-white md:text-xl">10K+</div>
-          <div class="mt-1 text-[11px] text-slate-300">Alumni</div>
+        <!-- 2. FLOATING CAPSULE NAVBAR -->
+        <div class="relative z-20 flex justify-center px-4 pt-6 md:pt-8 hero-fade-down">
+            <nav class="flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 backdrop-blur-xl md:px-6">
+                <a href="#" class="flex items-center gap-2 text-[15px] font-extrabold tracking-tight text-white">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-black">E</span>
+                    EdukasiTekno
+                </a>
+                <div class="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
+                    <a href="#" class="transition hover:text-white">Home</a>
+                    <a href="#section-edukasi" class="transition hover:text-white">Katalog</a>
+                    <a href="#" class="text-white">Tentang Kami</a>
+                    <a href="#" class="transition hover:text-white">Kontak</a>
+                </div>
+                <a href="#" class="rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-slate-200 md:px-5 md:text-sm">Masuk</a>
+            </nav>
         </div>
-        <div>
-          <div class="text-lg font-extrabold text-white md:text-xl">50+</div>
-          <div class="mt-1 text-[11px] text-slate-300">Modul</div>
+
+        <!-- 3. MAIN HERO CONTENT -->
+        <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-14 text-center md:py-16">
+            <h1 class="hero-animate hero-delay-1 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[68px]">
+                Membangun Generasi Talenta Digital Indonesia
+            </h1>
+            <p class="hero-animate hero-delay-2 mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">
+                Kami menghubungkan potensi anak bangsa dengan keterampilan teknologi
+                yang relevan, mentor dari industri, dan jalur nyata menuju karier digital.
+            </p>
+            <a href="#section-edukasi"
+               class="cta-pill hero-animate hero-delay-3 group mt-10 inline-flex items-center gap-4 rounded-full border border-white/20 bg-white/10 py-2 pl-6 pr-2 backdrop-blur-md transition hover:bg-white/15">
+                <span class="text-sm font-semibold text-white md:text-base">Daftar Materi Edukasi Terpopuler</span>
+                <span class="cta-arrow-circle flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-950">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </a>
         </div>
-        <div>
-          <div class="text-lg font-extrabold text-white md:text-xl">4.9<span class="text-indigo-300">/5</span></div>
-          <div class="mt-1 text-[11px] text-slate-300">Rating</div>
+
+        <!-- 4. BOTTOM FLOATING GLASS CARDS -->
+        <div class="relative z-10 flex flex-col gap-4 px-6 pb-8 md:px-8 md:pb-10 lg:block lg:px-0">
+            <div class="hero-animate hero-delay-4 w-full rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-white/[0.14] lg:absolute lg:bottom-10 lg:left-10 lg:w-[340px]">
+                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-200">Visi &amp; Misi</span>
+                <p class="mt-4 text-sm leading-relaxed text-slate-200"><span class="font-semibold text-white">Visi:</span> Menjadi ruang belajar teknologi paling relevan bagi talenta Indonesia.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-200"><span class="font-semibold text-white">Misi:</span> Menyediakan kurikulum praktis, mentor industri, dan komunitas yang mendukung pertumbuhan nyata.</p>
+            </div>
+
+            <div class="hero-animate hero-delay-5 w-full rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-white/[0.14] lg:absolute lg:bottom-10 lg:right-10 lg:w-[340px]">
+                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-200">Statistik &amp; Dampak</span>
+                <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+                    <div><div class="text-lg font-extrabold text-white md:text-xl">10K+</div><div class="mt-1 text-[11px] text-slate-300">Alumni</div></div>
+                    <div><div class="text-lg font-extrabold text-white md:text-xl">50+</div><div class="mt-1 text-[11px] text-slate-300">Modul</div></div>
+                    <div><div class="text-lg font-extrabold text-white md:text-xl">4.9<span class="text-indigo-300">/5</span></div><div class="mt-1 text-[11px] text-slate-300">Rating</div></div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-
-  </div>
-
-</section>
-
-<script>
-  (function () {
-    'use strict';
-
-    var hero = document.querySelector('#hero-illustration');
-    var section = hero ? hero.closest('section') : null;
-    if (!hero || !section) return;
-
-    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-    if (prefersReducedMotion || !hasFinePointer) return;
-
-    var ticking = false;
-    var lastX = 0;
-    var lastY = 0;
-
-    function applyParallax() {
-      hero.style.transform = 'translate(' + lastX + 'px,' + lastY + 'px)';
-      ticking = false;
-    }
-
-    section.addEventListener('pointermove', function (e) {
-      var rect = section.getBoundingClientRect();
-      var relX = (e.clientX - rect.left) / rect.width - 0.5;
-      var relY = (e.clientY - rect.top) / rect.height - 0.5;
-
-      lastX = relX * -16;
-      lastY = relY * -12;
-
-      if (!ticking) {
-        window.requestAnimationFrame(applyParallax);
-        ticking = true;
-      }
-    });
-
-    section.addEventListener('pointerleave', function () {
-      lastX = 0;
-      lastY = 0;
-      window.requestAnimationFrame(applyParallax);
-    });
-  })();
-</script>
-
-</body>
-</html>
+    </section>
 
     <!-- ==========================================
          SECTION 2: DAFTAR LIST MATERI EDUKASI (LULU)
          ========================================== -->
     <section id="section-edukasi" class="section-edukasi">
+        <span class="bg-orb bg-orb--a" aria-hidden="true"></span>
+        <span class="bg-orb bg-orb--b" aria-hidden="true"></span>
         <div class="container">
-            <!-- Section Heading -->
-            <div class="section-header">
+            <div class="section-header" data-reveal>
                 <span class="section-badge"><i class="fa-solid fa-graduation-cap"></i> Katalog Pembelajaran</span>
                 <h2 class="section-title">Daftar Materi Edukasi Terpopuler</h2>
                 <p class="section-subtitle">
@@ -461,9 +1223,7 @@
                     Pilih jalur belajar Anda hari ini.
                 </p>
             </div>
-
-            <!-- Card List Grid Container (Dynamically rendered via js/cards.js) -->
-            <div class="materi-grid" id="materi-cards-container">
+            <div class="materi-grid" id="materi-cards-container" data-reveal>
                 <!-- Data cards di-render dari js/data.js -->
             </div>
         </div>
@@ -473,25 +1233,20 @@
     <div id="modal-detail" class="modal-overlay" aria-hidden="true" role="dialog">
         <div class="modal-container">
             <button class="modal-close-btn" id="modal-close" aria-label="Tutup Modal">&times;</button>
-            <img id="modal-img" src="" alt="Gambar Detail Materi" class="modal-header-img">
-
+            <div id="modal-img" class="modal-header-img" role="img" aria-label="Gambar Detail Materi"></div>
             <div class="modal-body">
                 <span id="modal-category" class="modal-badge">Kategori</span>
                 <h3 id="modal-title" class="modal-title">Judul Materi Edukasi</h3>
                 <p id="modal-desc" class="modal-description">Deskripsi lengkap materi akan tampil di sini.</p>
-
                 <h4 class="modal-section-title"><i class="fa-solid fa-list-check"></i> Silabus & Topik Pembahasan</h4>
                 <ul id="modal-syllabus" class="modal-syllabus-list">
                     <!-- Silabus diisi secara dinamis dari js/modal.js -->
                 </ul>
-
                 <h4 class="modal-section-title"><i class="fa-solid fa-shield-halved"></i> Prasarat Peserta</h4>
                 <p id="modal-prereq" class="modal-description" style="margin-bottom: 1.5rem;"></p>
-
                 <div class="modal-actions">
                     <button class="btn btn-outline" id="modal-btn-cancel">Tutup</button>
-                    <a id="modal-link-external" href="https://www.w3schools.com/" target="_blank"
-                        class="btn btn-primary">
+                    <a id="modal-link-external" href="https://www.w3schools.com/" target="_blank" class="btn btn-primary">
                         <i class="fa-solid fa-external-link"></i> Pelajari Selengkapnya
                     </a>
                 </div>
@@ -499,667 +1254,67 @@
         </div>
     </div>
 
-
     <!-- ==========================================
          SECTION 3: VIDEO BLOG WEB (NABIL)
          ========================================== -->
-   <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meet Liquid Glass — Building Modern Web UI | EdukasiTekno</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<style>
-  html, body {
-    background: #0B0D1B;
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  }
-
-  /* Global ambient radial glow — dipertahankan konsisten dengan landing page */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -220px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 900px;
-    height: 700px;
-    background: radial-gradient(circle, rgba(99,102,241,0.22), transparent 65%);
-    filter: blur(10px);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  #app-root { position: relative; z-index: 1; }
-
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: #0B0D1B; }
-  ::-webkit-scrollbar-thumb { background: #26304A; border-radius: 999px; }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  @keyframes vd-fade-up {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .vd-fade-up { animation: vd-fade-up 500ms cubic-bezier(0.16,1,0.3,1) both; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .vd-fade-up { animation: none; opacity: 1; transform: none; }
-    .animate-ping { animation: none; }
-  }
-</style>
-</head>
-
-<body class="bg-[#0B0D1B] text-white antialiased">
-<div id="app-root">
-
-<!-- ==================================================================
-     TOP NAVIGATION — floating pill navbar, konsisten dgn landing page
-     ================================================================== -->
-<header class="sticky top-4 z-50 flex justify-center px-4">
-  <div class="flex w-full max-w-4xl items-center justify-between gap-4 rounded-full border border-white/10 bg-[#131728]/80 px-5 py-2.5 backdrop-blur-md md:px-6">
-
-    <a href="#" class="flex shrink-0 items-center gap-2 text-sm font-bold text-white">
-      <span class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-black">E</span>
-      <span class="hidden sm:inline">EdukasiTekno</span>
-    </a>
-
-    <nav class="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
-      <a href="#" class="transition hover:text-white">Home</a>
-      <a href="#" class="transition hover:text-white">Katalog</a>
-      <a href="#" class="transition hover:text-white">Tentang Kami</a>
-      <a href="#" class="transition hover:text-white">Kontak</a>
-    </nav>
-
-    <a href="#" class="shrink-0 rounded-full bg-white px-5 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 md:text-sm">
-      Masuk
-    </a>
-  </div>
-</header>
-
-<!-- Back-to-catalog strip (di bawah navbar pill, tidak mengganggu style floating) -->
-<div class="mx-auto mt-4 flex max-w-6xl items-center px-6">
-  <a href="#" class="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
-    <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i>
-    Kembali ke Katalog Video
-  </a>
-</div>
-
-<!-- ==================================================================
-     MAIN LAYOUT — single highlighted video (tanpa sidebar related videos)
-     ================================================================== -->
-<main class="mx-auto max-w-4xl px-6 py-8 md:py-12">
-
-  <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold tracking-wider text-indigo-300">
-    <i data-lucide="play-circle" class="h-3.5 w-3.5"></i>
-    VIDEO LEARNING
-  </span>
-
-  <div id="video-player-anchor" class="mt-4 scroll-mt-24">
-    <div class="relative">
-      <!-- Ambient glow / bioscope effect -->
-      <div aria-hidden="true" class="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 opacity-25 blur-3xl"></div>
-
-      <div id="player-wrapper" class="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-800/80 bg-[#131728] shadow-2xl">
-        <!-- facade / iframe di-render oleh JS -->
-      </div>
-    </div>
-  </div>
-
-  <h1 id="video-title" class="mt-6 text-xl font-bold leading-snug text-white md:text-2xl"></h1>
-
-  <div class="mt-6">
-    <div id="tab-bar" role="tablist" aria-label="Bagian video" class="flex flex-wrap gap-2"></div>
-  </div>
-
-  <div id="tab-content" class="mt-6"></div>
-
-</main>
-
-</div><!-- /#app-root -->
-
-<!-- ==================================================================
-     VANILLA JS — data + state + rendering + interactivity
-     ================================================================== -->
-<script>
-(function () {
-  'use strict';
-
-  /* ----------------------------------------------------------------
-     1. DATA (dummy — ganti sesuai kebutuhan)
-  ---------------------------------------------------------------- */
-  const VIDEO = {
-    // Ganti dengan ID video YouTube asli. Thumbnail facade otomatis mengikuti ID ini.
-    youtubeId: 'VIDEO_ID_HERE',
-    title: '[Vlog Presentasi UAS Pemrograman Web I] - EdukasiTekno: Platform Pembelajaran Teknologi Modern',
-    description:
-      'Video ini berisi dokumentasi pengerjaan, demonstrasi fitur, serta penjelasan arsitektur source code aplikasi web EdukasiTekno. Web ini dikembangkan sebagai platform edukasi digital modern yang menyajikan modul interaktif dan katalog pembelajaran teknologi.',
-    releaseDate: '2026-06-12',
-    tags: ['#UAS', '#PemrogramanWebI', '#EdukasiTekno'],
-    speaker: { name: 'aajinabil18', role: 'Senior Frontend Engineer', initials: 'AJ' },
-    taskInfo: [
-      { label: 'Mata Kuliah', value: 'Pemrograman Web I (IF210)' },
-      { label: 'Program Studi', value: 'PJJ Informatika — Universitas Siber Asia' },
-      { label: 'Dosen Pengampu', value: 'Riad Sahara, S.SI., M.T.' },
-      { label: 'Anggota Kelompok', value: 'Lulu Maulana Malik, A. M. Nabil Aiendra Dzikra, Abdul Majid' },
-    ],
-    implementationPoints: [
-      {
-        title: 'Struktur HTML5 Lengkap',
-        description: 'Penerapan Heading, Paragraph, Text Formatting, Link, List, Table (katalog harga & modul), Form interaktif, serta embed Media (Audio & Video Player Facade).',
-      },
-      {
-        title: 'Styling & Template',
-        description: 'Menggunakan Tailwind CSS kustom dengan tema Modern Dark Aesthetic/Glassmorphism yang konsisten dan fully responsive di berbagai ukuran layar.',
-      },
-      {
-        title: 'Elemen JavaScript',
-        description: 'Manipulasi DOM untuk navigasi tab interaktif (About/Summary/Transkrip), filtering/search, serta seek-timestamp player secara dinamis.',
-      },
-    ],
-    // Ganti dengan link repository asli (GitHub/GitLab)
-    repoLink: '#',
-    keyTakeaways: [
-      'Konsep utama di balik efek "liquid glass" dan kapan sebaiknya dipakai.',
-      'Cara menyusun lapisan blur, border, dan glow tanpa membebani performa render.',
-      'Pola komponen reusable untuk card, modal, dan navigasi bergaya glassmorphism.',
-      'Tips aksesibilitas: kontras teks tetap terjaga di atas background transparan.',
-    ],
-    chapters: [
-      { time: 0, label: '00:00', title: 'Pembukaan' },
-      { time: 135, label: '02:15', title: 'Pengenalan Design System' },
-      { time: 320, label: '05:20', title: 'Lapisan Blur & Transparansi' },
-      { time: 540, label: '09:00', title: 'Border & Glow Halus' },
-      { time: 760, label: '12:40', title: 'Studi Kasus: Card & Modal' },
-      { time: 980, label: '16:20', title: 'Penutup & Rekomendasi' },
-    ],
-    transcript: [
-      { time: 0, label: '00:00', text: 'Halo semuanya, selamat datang kembali di seri video pengembangan web kita.' },
-      { time: 18, label: '00:18', text: 'Hari ini kita akan membahas tren desain yang sedang naik daun: liquid glass.' },
-      { time: 135, label: '02:15', text: 'Liquid glass pada dasarnya adalah kombinasi dari blur, transparansi, dan pencahayaan tipis di tepi elemen.' },
-      { time: 320, label: '05:20', text: 'Mari kita mulai dari lapisan paling dasar: backdrop-filter blur dan bagaimana browser merender lapisan ini.' },
-      { time: 540, label: '09:00', text: 'Selanjutnya, border tipis dengan opacity rendah memberi kesan "kaca" tanpa membuat elemen terlihat berat.' },
-      { time: 760, label: '12:40', text: 'Kita terapkan pola ini pada komponen card dan modal supaya konsisten di seluruh produk.' },
-      { time: 980, label: '16:20', text: 'Sebagai penutup, berikut beberapa rekomendasi bacaan dan resource tambahan.' },
-    ],
-    resources: [
-      { title: 'Starter Component — Glass Card', description: 'Kode React + Tailwind siap pakai untuk komponen card bergaya liquid glass.', href: 'https://github.com/', type: 'code' },
-      { title: 'Dokumentasi backdrop-filter (MDN)', description: 'Referensi lengkap dukungan browser dan performa backdrop-filter.', href: 'https://developer.mozilla.org/', type: 'doc' },
-      { title: 'Design Tokens — Figma Community File', description: 'File Figma berisi token warna, radius, dan efek glass yang dipakai di video ini.', href: 'https://figma.com/', type: 'link' },
-    ],
-  };
-
-  const RESOURCE_ICONS = { code: 'code-2', doc: 'file-text', link: 'external-link' };
-
-  /* ----------------------------------------------------------------
-     2. STATE
-  ---------------------------------------------------------------- */
-  const state = {
-    hasPlayed: false,
-    startAt: 0,
-    activeTab: 'about', // 'about' | 'summary' | 'transcript' | 'resource'
-  };
-
-  const TABS = [
-    { key: 'about', label: 'About' },
-    { key: 'summary', label: 'Summary' },
-    { key: 'transcript', label: 'Transkrip' },
-    { key: 'resource', label: 'Resource / Code' },
-  ];
-
-  /* ----------------------------------------------------------------
-     3. HELPERS
-  ---------------------------------------------------------------- */
-  function formatDate(iso) {
-    const d = new Date(iso);
-    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  /* ----------------------------------------------------------------
-     4. RENDER: PLAYER (facade <-> iframe)
-  ---------------------------------------------------------------- */
-  function renderPlayer() {
-    const wrapper = document.getElementById('player-wrapper');
-
-    if (state.hasPlayed) {
-      const src =
-        'https://www.youtube.com/embed/' + VIDEO.youtubeId +
-        '?rel=0&modestbranding=1&autoplay=1' +
-        (state.startAt ? '&start=' + state.startAt : '');
-
-      wrapper.innerHTML =
-        '<iframe src="' + src + '" title="' + escapeHtml(VIDEO.title) + '" ' +
-        'class="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-      return;
-    }
-
-    wrapper.innerHTML =
-      '<button type="button" onclick="VD.playVideo()" aria-label="Putar video: ' + escapeHtml(VIDEO.title) + '" class="group relative h-full w-full">' +
-        '<img id="facade-thumb" src="https://img.youtube.com/vi/' + VIDEO.youtubeId + '/maxresdefault.jpg" alt="' + escapeHtml(VIDEO.title) + '" ' +
-          'class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" ' +
-          'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + VIDEO.youtubeId + '/hqdefault.jpg\';">' +
-        '<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10"></div>' +
-        '<span class="absolute inset-0 flex items-center justify-center">' +
-          '<span class="relative flex h-20 w-20 items-center justify-center">' +
-            '<span class="absolute inset-0 animate-ping rounded-full bg-white/20"></span>' +
-            '<span class="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/30 bg-white/10 backdrop-blur-md transition group-hover:scale-110 group-hover:bg-white/20">' +
-              '<svg class="ml-1 h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
-            '</span>' +
-          '</span>' +
-        '</span>' +
-      '</button>';
-  }
-
-  function playVideo(seconds) {
-    state.startAt = seconds || 0;
-    state.hasPlayed = true;
-    renderPlayer();
-  }
-
-  function seekTo(seconds) {
-    state.startAt = seconds;
-    state.hasPlayed = true;
-    renderPlayer();
-    const anchor = document.getElementById('video-player-anchor');
-    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  /* ----------------------------------------------------------------
-     5. RENDER: TAB BAR
-  ---------------------------------------------------------------- */
-  function renderTabBar() {
-    const el = document.getElementById('tab-bar');
-    el.innerHTML = TABS.map(function (tab) {
-      const isActive = tab.key === state.activeTab;
-      return (
-        '<button role="tab" aria-selected="' + isActive + '" onclick="VD.setActiveTab(\'' + tab.key + '\')" ' +
-        'class="shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition duration-200 ' +
-        (isActive
-          ? 'border-indigo-400/50 bg-indigo-500/15 text-white'
-          : 'border-slate-800/80 bg-[#131728] text-zinc-400 hover:border-slate-700 hover:text-zinc-200') + '">' +
-        tab.label + '</button>'
-      );
-    }).join('');
-  }
-
-  function setActiveTab(tab) {
-    state.activeTab = tab;
-    renderTabBar();
-    renderTabContent();
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  /* ----------------------------------------------------------------
-     6. RENDER: TAB CONTENT
-  ---------------------------------------------------------------- */
-  function renderTabContent() {
-    const el = document.getElementById('tab-content');
-    el.className = 'mt-6 vd-fade-up';
-
-    if (state.activeTab === 'about') el.innerHTML = tplAbout();
-    else if (state.activeTab === 'summary') el.innerHTML = tplSummary();
-    else if (state.activeTab === 'transcript') el.innerHTML = tplTranscript();
-    else if (state.activeTab === 'resource') el.innerHTML = tplResource();
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  function tplAbout() {
-    const tags = VIDEO.tags.map(function (t) {
-      return '<span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300">' + escapeHtml(t) + '</span>';
-    }).join('');
-
-    const implementationPoints = VIDEO.implementationPoints.map(function (point, i) {
-      return (
-        '<li class="flex gap-3">' +
-          '<span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 text-xs font-bold text-indigo-300">' + (i + 1) + '</span>' +
-          '<div>' +
-            '<div class="text-sm font-semibold text-white">' + escapeHtml(point.title) + '</div>' +
-            '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(point.description) + '</p>' +
-          '</div>' +
-        '</li>'
-      );
-    }).join('');
-
-    const taskInfo = VIDEO.taskInfo.map(function (item) {
-      return (
-        '<div>' +
-          '<div class="text-[11px] uppercase tracking-wider text-zinc-500">' + escapeHtml(item.label) + '</div>' +
-          '<div class="mt-1 text-sm leading-relaxed text-zinc-300">' + escapeHtml(item.value) + '</div>' +
-        '</div>'
-      );
-    }).join('<div class="my-3 border-t border-slate-800/80"></div>');
-
-    return (
-      '<div class="grid grid-cols-1 gap-10 md:grid-cols-[1fr_280px]">' +
-        '<div>' +
-          '<p class="text-[15px] leading-relaxed text-zinc-300">' + escapeHtml(VIDEO.description) + '</p>' +
-
-          '<h3 class="mt-8 text-sm font-semibold text-white">Poin Implementasi Materi (Pertemuan 1–15)</h3>' +
-          '<ul class="mt-4 space-y-4">' + implementationPoints + '</ul>' +
-
-          '<a href="' + VIDEO.repoLink + '" target="_blank" rel="noopener noreferrer" ' +
-          'class="mt-8 inline-flex items-center gap-2 rounded-full border border-slate-800/80 bg-[#131728] px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-indigo-400/40 hover:text-white">' +
-            '<i data-lucide="github" class="h-4 w-4"></i>' +
-            'Link Repository Source Code' +
-          '</a>' +
-
-          '<div class="mt-6 flex flex-wrap gap-2">' + tags + '</div>' +
-        '</div>' +
-
-        '<div class="flex flex-col gap-4">' +
-          '<div class="flex flex-col gap-5 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
-            '<div class="flex items-center gap-3">' +
-              '<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-sm font-bold text-white">' + VIDEO.speaker.initials + '</span>' +
-              '<div>' +
-                '<div class="text-sm font-semibold text-white">' + escapeHtml(VIDEO.speaker.name) + '</div>' +
-                '<div class="text-xs text-zinc-500">' + escapeHtml(VIDEO.speaker.role) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="border-t border-slate-800/80 pt-4">' +
-              '<div class="text-[11px] uppercase tracking-wider text-zinc-500">Tanggal Rilis</div>' +
-              '<div class="mt-1 text-sm text-zinc-300">' + formatDate(VIDEO.releaseDate) + '</div>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
-            '<div class="text-sm font-semibold text-white">Detail Tugas Akhir</div>' +
-            '<div class="mt-4">' + taskInfo + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  function tplSummary() {
-    const takeaways = VIDEO.keyTakeaways.map(function (point) {
-      return (
-        '<li class="flex items-start gap-3 text-sm text-zinc-300">' +
-          '<i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-indigo-400"></i>' +
-          '<span class="leading-relaxed">' + escapeHtml(point) + '</span>' +
-        '</li>'
-      );
-    }).join('');
-
-    const chapters = VIDEO.chapters.map(function (ch) {
-      return (
-        '<button onclick="VD.seekTo(' + ch.time + ')" class="group flex items-center gap-3 rounded-lg px-2 py-2.5 text-left transition hover:bg-white/5">' +
-          '<span class="w-12 shrink-0 font-mono text-xs text-indigo-400">' + ch.label + '</span>' +
-          '<span class="text-sm text-zinc-300 transition group-hover:text-white">' + escapeHtml(ch.title) + '</span>' +
-        '</button>'
-      );
-    }).join('');
-
-    return (
-      '<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">' +
-        '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
-          '<h3 class="text-sm font-semibold text-white">Key Takeaways</h3>' +
-          '<ul class="mt-4 space-y-3">' + takeaways + '</ul>' +
-        '</div>' +
-        '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
-          '<h3 class="text-sm font-semibold text-white">Chapter</h3>' +
-          '<div class="mt-3 flex flex-col divide-y divide-white/5">' + chapters + '</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  function tplTranscript() {
-    const lines = VIDEO.transcript.map(function (line) {
-      return (
-        '<div class="flex gap-4">' +
-          '<button onclick="VD.seekTo(' + line.time + ')" class="h-fit shrink-0 rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-indigo-400 transition hover:bg-white/10 hover:text-indigo-300">' + line.label + '</button>' +
-          '<p class="text-sm leading-relaxed text-zinc-300">' + escapeHtml(line.text) + '</p>' +
-        '</div>'
-      );
-    }).join('');
-
-    return '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6"><div class="flex flex-col gap-5">' + lines + '</div></div>';
-  }
-
-  function tplResource() {
-    const items = VIDEO.resources.map(function (r) {
-      return (
-        '<a href="' + r.href + '" target="_blank" rel="noopener noreferrer" ' +
-        'class="group flex items-start gap-4 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5 transition hover:border-indigo-400/40 hover:bg-white/[0.03]">' +
-          '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">' +
-            '<i data-lucide="' + (RESOURCE_ICONS[r.type] || 'link') + '" class="h-5 w-5"></i>' +
-          '</span>' +
-          '<div class="flex-1">' +
-            '<div class="text-sm font-semibold text-white">' + escapeHtml(r.title) + '</div>' +
-            '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(r.description) + '</p>' +
-          '</div>' +
-          '<i data-lucide="chevron-right" class="mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-zinc-400"></i>' +
-        '</a>'
-      );
-    }).join('');
-
-    return '<div class="flex flex-col gap-3">' + items + '</div>';
-  }
-
-  /* ----------------------------------------------------------------
-     7. INIT
-  ---------------------------------------------------------------- */
-  function init() {
-    document.getElementById('video-title').textContent = VIDEO.title;
-    renderPlayer();
-    renderTabBar();
-    renderTabContent();
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  // Ekspos fungsi yang dipanggil lewat onclick inline ke namespace global "VD"
-  // supaya tidak mencemari global scope dengan banyak nama fungsi terpisah.
-  window.VD = { playVideo: playVideo, seekTo: seekTo, setActiveTab: setActiveTab };
-
-  document.addEventListener('DOMContentLoaded', init);
-})();
-</script>
-
-</body>
-</html>
-  }
-
-  /* ----------------------------------------------------------------
-     6. RENDER: TAB CONTENT
-  ---------------------------------------------------------------- */
-  function renderTabContent() {
-    const el = document.getElementById('tab-content');
-    el.className = 'mt-6 vd-fade-up';
-
-    if (state.activeTab === 'about') el.innerHTML = tplAbout();
-    else if (state.activeTab === 'summary') el.innerHTML = tplSummary();
-    else if (state.activeTab === 'transcript') el.innerHTML = tplTranscript();
-    else if (state.activeTab === 'resource') el.innerHTML = tplResource();
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  function tplAbout() {
-    const tags = VIDEO.tags.map(function (t) {
-      return '<span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300">' + escapeHtml(t) + '</span>';
-    }).join('');
-
-    const implementationPoints = VIDEO.implementationPoints.map(function (point, i) {
-      return (
-        '<li class="flex gap-3">' +
-          '<span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 text-xs font-bold text-indigo-300">' + (i + 1) + '</span>' +
-          '<div>' +
-            '<div class="text-sm font-semibold text-white">' + escapeHtml(point.title) + '</div>' +
-            '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(point.description) + '</p>' +
-          '</div>' +
-        '</li>'
-      );
-    }).join('');
-
-    const taskInfo = VIDEO.taskInfo.map(function (item) {
-      return (
-        '<div>' +
-          '<div class="text-[11px] uppercase tracking-wider text-zinc-500">' + escapeHtml(item.label) + '</div>' +
-          '<div class="mt-1 text-sm leading-relaxed text-zinc-300">' + escapeHtml(item.value) + '</div>' +
-        '</div>'
-      );
-    }).join('<div class="my-3 border-t border-slate-800/80"></div>');
-
-    return (
-      '<div class="grid grid-cols-1 gap-10 md:grid-cols-[1fr_280px]">' +
-        '<div>' +
-          '<p class="text-[15px] leading-relaxed text-zinc-300">' + escapeHtml(VIDEO.description) + '</p>' +
-
-          '<h3 class="mt-8 text-sm font-semibold text-white">Poin Implementasi Materi (Pertemuan 1–15)</h3>' +
-          '<ul class="mt-4 space-y-4">' + implementationPoints + '</ul>' +
-
-          '<a href="' + VIDEO.repoLink + '" target="_blank" rel="noopener noreferrer" ' +
-          'class="mt-8 inline-flex items-center gap-2 rounded-full border border-slate-800/80 bg-[#131728] px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-indigo-400/40 hover:text-white">' +
-            '<i data-lucide="github" class="h-4 w-4"></i>' +
-            'Link Repository Source Code' +
-          '</a>' +
-
-          '<div class="mt-6 flex flex-wrap gap-2">' + tags + '</div>' +
-        '</div>' +
-
-        '<div class="flex flex-col gap-4">' +
-          '<div class="flex flex-col gap-5 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
-            '<div class="flex items-center gap-3">' +
-              '<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-sm font-bold text-white">' + VIDEO.speaker.initials + '</span>' +
-              '<div>' +
-                '<div class="text-sm font-semibold text-white">' + escapeHtml(VIDEO.speaker.name) + '</div>' +
-                '<div class="text-xs text-zinc-500">' + escapeHtml(VIDEO.speaker.role) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="border-t border-slate-800/80 pt-4">' +
-              '<div class="text-[11px] uppercase tracking-wider text-zinc-500">Tanggal Rilis</div>' +
-              '<div class="mt-1 text-sm text-zinc-300">' + formatDate(VIDEO.releaseDate) + '</div>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
-            '<div class="text-sm font-semibold text-white">Detail Tugas Akhir</div>' +
-            '<div class="mt-4">' + taskInfo + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  function tplSummary() {
-    const takeaways = VIDEO.keyTakeaways.map(function (point) {
-      return (
-        '<li class="flex items-start gap-3 text-sm text-zinc-300">' +
-          '<i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-indigo-400"></i>' +
-          '<span class="leading-relaxed">' + escapeHtml(point) + '</span>' +
-        '</li>'
-      );
-    }).join('');
-
-    const chapters = VIDEO.chapters.map(function (ch) {
-      return (
-        '<button onclick="VD.seekTo(' + ch.time + ')" class="group flex items-center gap-3 rounded-lg px-2 py-2.5 text-left transition hover:bg-white/5">' +
-          '<span class="w-12 shrink-0 font-mono text-xs text-indigo-400">' + ch.label + '</span>' +
-          '<span class="text-sm text-zinc-300 transition group-hover:text-white">' + escapeHtml(ch.title) + '</span>' +
-        '</button>'
-      );
-    }).join('');
-
-    return (
-      '<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">' +
-        '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
-          '<h3 class="text-sm font-semibold text-white">Key Takeaways</h3>' +
-          '<ul class="mt-4 space-y-3">' + takeaways + '</ul>' +
-        '</div>' +
-        '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
-          '<h3 class="text-sm font-semibold text-white">Chapter</h3>' +
-          '<div class="mt-3 flex flex-col divide-y divide-white/5">' + chapters + '</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  function tplTranscript() {
-    const lines = VIDEO.transcript.map(function (line) {
-      return (
-        '<div class="flex gap-4">' +
-          '<button onclick="VD.seekTo(' + line.time + ')" class="h-fit shrink-0 rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-indigo-400 transition hover:bg-white/10 hover:text-indigo-300">' + line.label + '</button>' +
-          '<p class="text-sm leading-relaxed text-zinc-300">' + escapeHtml(line.text) + '</p>' +
-        '</div>'
-      );
-    }).join('');
-
-    return '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6"><div class="flex flex-col gap-5">' + lines + '</div></div>';
-  }
-
-  function tplResource() {
-    const items = VIDEO.resources.map(function (r) {
-      return (
-        '<a href="' + r.href + '" target="_blank" rel="noopener noreferrer" ' +
-        'class="group flex items-start gap-4 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5 transition hover:border-indigo-400/40 hover:bg-white/[0.03]">' +
-          '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">' +
-            '<i data-lucide="' + (RESOURCE_ICONS[r.type] || 'link') + '" class="h-5 w-5"></i>' +
-          '</span>' +
-          '<div class="flex-1">' +
-            '<div class="text-sm font-semibold text-white">' + escapeHtml(r.title) + '</div>' +
-            '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(r.description) + '</p>' +
-          '</div>' +
-          '<i data-lucide="chevron-right" class="mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-zinc-400"></i>' +
-        '</a>'
-      );
-    }).join('');
-
-    return '<div class="flex flex-col gap-3">' + items + '</div>';
-  }
-
-  /* ----------------------------------------------------------------
-     7. INIT
-  ---------------------------------------------------------------- */
-  function init() {
-    document.getElementById('video-title').textContent = VIDEO.title;
-    renderPlayer();
-    renderTabBar();
-    renderTabContent();
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  // Ekspos fungsi yang dipanggil lewat onclick inline ke namespace global "VD"
-  // supaya tidak mencemari global scope dengan banyak nama fungsi terpisah.
-  window.VD = { playVideo: playVideo, seekTo: seekTo, setActiveTab: setActiveTab };
-
-  document.addEventListener('DOMContentLoaded', init);
-})();
-</script>
-
-</body>
-</html>
+    <div id="app-root" class="bg-[#0B0D1B] text-white antialiased">
+
+        <header class="sticky top-4 z-50 flex justify-center px-4">
+            <div class="flex w-full max-w-4xl items-center justify-between gap-4 rounded-full border border-white/10 bg-[#131728]/80 px-5 py-2.5 backdrop-blur-md md:px-6">
+                <a href="#" class="flex shrink-0 items-center gap-2 text-sm font-bold text-white">
+                    <span class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-black">E</span>
+                    <span class="hidden sm:inline">EdukasiTekno</span>
+                </a>
+                <nav class="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
+                    <a href="#" class="transition hover:text-white">Home</a>
+                    <a href="#section-edukasi" class="transition hover:text-white">Katalog</a>
+                    <a href="#" class="transition hover:text-white">Tentang Kami</a>
+                    <a href="#" class="transition hover:text-white">Kontak</a>
+                </nav>
+                <a href="#" class="shrink-0 rounded-full bg-white px-5 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 md:text-sm">Masuk</a>
+            </div>
+        </header>
+
+        <div class="mx-auto mt-4 flex max-w-6xl items-center px-6">
+            <a href="#section-edukasi" class="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
+                <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i>
+                Kembali ke Katalog Video
+            </a>
+        </div>
+
+        <main class="mx-auto max-w-4xl px-6 py-8 md:py-12">
+            <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold tracking-wider text-indigo-300">
+                <i data-lucide="play-circle" class="h-3.5 w-3.5"></i>
+                VIDEO LEARNING
+            </span>
+
+            <div id="video-player-anchor" class="mt-4 scroll-mt-24">
+                <div class="relative video-container-reveal">
+                    <div aria-hidden="true" class="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 opacity-25 blur-3xl"></div>
+                    <div id="player-wrapper" class="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-800/80 bg-[#131728] shadow-2xl">
+                        <!-- facade / iframe di-render oleh JS -->
+                    </div>
+                </div>
+            </div>
+
+            <h1 id="video-title" class="mt-6 text-xl font-bold leading-snug text-white md:text-2xl"></h1>
+
+            <div class="mt-6">
+                <div id="tab-bar" role="tablist" aria-label="Bagian video" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <div id="tab-content" class="mt-6"></div>
+        </main>
+
+    </div><!-- /#app-root -->
 
     <!-- ==========================================
          SECTION 4: TABLE LIST NAMA MATERI, HARGA, & TINGKAT KESULITAN (LULU)
          ========================================== -->
     <section id="section-table" class="section-table">
+        <span class="bg-orb bg-orb--c" aria-hidden="true"></span>
         <div class="container">
-            <!-- Section Heading -->
-            <div class="section-header">
+            <div class="section-header" data-reveal>
                 <span class="section-badge"><i class="fa-solid fa-table-list"></i> Tabel Informasi Materi</span>
                 <h2 class="section-title">Daftar Lengkap Harga & Tingkat Kesulitan</h2>
                 <p class="section-subtitle">
@@ -1168,16 +1323,14 @@
                 </p>
             </div>
 
-            <!-- Table Toolbar (Search & Filter) -->
-            <div class="table-toolbar">
+            <div class="table-toolbar" data-reveal>
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="table-search-input" class="search-input"
                         placeholder="Cari nama materi atau kategori...">
                 </div>
                 <div class="table-filter-group">
-                    <label for="filter-difficulty" style="font-size: 0.85rem; color: var(--text-muted);"><i
-                            class="fa-solid fa-filter"></i></label>
+                    <label for="filter-difficulty" style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-solid fa-filter"></i></label>
                     <select id="filter-difficulty" class="select-filter">
                         <option value="all">Semua</option>
                         <option value="pemula">Pemula</option>
@@ -1187,8 +1340,7 @@
                 </div>
             </div>
 
-            <!-- Responsive Table Container -->
-            <div class="table-responsive-wrapper">
+            <div class="table-responsive-wrapper" data-reveal>
                 <table class="materi-table" id="materi-table-element">
                     <thead>
                         <tr>
@@ -1213,7 +1365,7 @@
          ========================================== -->
     <section id="section-feedback">
         <div class="container">
-            <div class="section-placeholder">
+            <div class="section-placeholder" data-reveal>
                 <span class="placeholder-badge">Section 5</span>
                 <h3>Form Input Feedback</h3>
                 <p>Bagian ini disediakan untuk <strong>Majid</strong> (Form Input & Feedback User).</p>
@@ -1224,11 +1376,1154 @@
     <!-- ==========================================
          MODULAR JAVASCRIPT SCRIPTS
          ========================================== -->
-    <script src="js/data.js"></script>
-    <script src="js/cards.js"></script>
-    <script src="js/modal.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/main.js"></script>
+    <!-- ==========================================
+         MODULAR JAVASCRIPT — sebelumnya file js/ terpisah, sekarang inline
+         Urutan tetap dipertahankan: data.js harus lebih dulu dari
+         cards.js/table.js karena keduanya memakai `materiData`.
+         interactions.js paling akhir karena butuh elemen yang
+         dirender oleh cards.js/table.js sudah ada di DOM.
+         ========================================== -->
+    <script>
+/* ==========================================================================
+   js/data.js
+   --------------------------------------------------------------------------
+   Sumber data tunggal untuk seluruh materi edukasi. Dipakai oleh:
+   - cards.js  -> render 3 card "Materi Terpopuler" (item dengan popular:true)
+   - table.js  -> render seluruh baris tabel harga & tingkat kesulitan
+   - modal.js  -> isi detail popup saat "Detail Materi" diklik
+   ========================================================================== */
+
+const CATEGORY_STYLE = {
+  'Web Development': { accent: '#38BDF8', gradient: 'linear-gradient(135deg, rgba(56,189,248,0.28), #0B1220 75%)' },
+  'Data Science':     { accent: '#A78BFA', gradient: 'linear-gradient(135deg, rgba(167,139,250,0.28), #0B1220 75%)' },
+  'UI/UX Design':     { accent: '#F472B6', gradient: 'linear-gradient(135deg, rgba(244,114,182,0.28), #0B1220 75%)' },
+  'Cyber Security':   { accent: '#FB7185', gradient: 'linear-gradient(135deg, rgba(251,113,133,0.28), #0B1220 75%)' },
+};
+
+function getCategoryStyle(category) {
+  return CATEGORY_STYLE[category] || { accent: '#818CF8', gradient: 'linear-gradient(135deg, #1E293B, #0F172A)' };
+}
+
+const materiData = [
+  {
+    id: 'web-dasar',
+    title: 'Dasar Pemrograman Web HTML5 & CSS3',
+    category: 'Web Development',
+    icon: 'fa-brands fa-html5',
+    difficulty: 'pemula',
+    modules: 10,
+    hours: 15,
+    price: 0,
+    popular: false,
+    description: 'Pelajari fondasi utama pembuatan website modern, mulai dari struktur dokumen, semantic tag, hingga styling dasar dengan CSS3.',
+    syllabus: [
+      'Struktur dasar HTML5 & semantic elements',
+      'Text formatting, list, table, dan form',
+      'Box model, flexbox, dan grid layout CSS3',
+      'Responsive design dengan media query',
+    ],
+    prereq: 'Tidak ada prasyarat khusus — cocok untuk pemula yang baru mulai belajar web.',
+  },
+  {
+    id: 'web-modern',
+    title: 'Pemrograman Web Modern (HTML, CSS & JS)',
+    category: 'Web Development',
+    icon: 'fa-brands fa-html5',
+    difficulty: 'pemula',
+    modules: 12,
+    hours: 18,
+    price: 0,
+    popular: true,
+    description: 'Pelajari fondasi utama pembuatan website modern, tata letak responsif, hingga manipulasi DOM secara interaktif dengan JavaScript.',
+    syllabus: [
+      'Struktur HTML5 & styling CSS3 modern',
+      'Layout responsif dengan Flexbox & Grid',
+      'Dasar JavaScript & manipulasi DOM',
+      'Studi kasus: membangun landing page interaktif',
+    ],
+    prereq: 'Tidak ada prasyarat khusus — cocok untuk pemula yang baru mulai belajar web.',
+  },
+  {
+    id: 'js-dom',
+    title: 'JavaScript DOM & Asynchronous Fetch API',
+    category: 'Web Development',
+    icon: 'fa-brands fa-js',
+    difficulty: 'menengah',
+    modules: 14,
+    hours: 20,
+    price: 150000,
+    popular: false,
+    description: 'Kuasai manipulasi DOM tingkat lanjut serta komunikasi asynchronous dengan Fetch API untuk membangun aplikasi web yang interaktif.',
+    syllabus: [
+      'DOM traversal & event delegation',
+      'Asynchronous JavaScript: Promise & async/await',
+      'Fetch API & konsumsi REST API',
+      'Error handling pada request asynchronous',
+    ],
+    prereq: 'Sudah memahami dasar HTML, CSS, dan JavaScript.',
+  },
+  {
+    id: 'react-node',
+    title: 'Fullstack Web Framework React & Node.js',
+    category: 'Web Development',
+    icon: 'fa-brands fa-react',
+    difficulty: 'mahir',
+    modules: 24,
+    hours: 40,
+    price: 350000,
+    popular: false,
+    description: 'Bangun aplikasi web fullstack modern menggunakan React di sisi frontend dan Node.js/Express di sisi backend.',
+    syllabus: [
+      'React fundamentals: component, state, props',
+      'React Hooks & state management',
+      'Membangun REST API dengan Node.js & Express',
+      'Integrasi frontend-backend & deployment',
+    ],
+    prereq: 'Menguasai JavaScript ES6+ dan konsep dasar REST API.',
+  },
+  {
+    id: 'python-data',
+    title: 'Python Fundamental untuk Data Analyst',
+    category: 'Data Science',
+    icon: 'fa-brands fa-python',
+    difficulty: 'pemula',
+    modules: 12,
+    hours: 18,
+    price: 0,
+    popular: false,
+    description: 'Kuasai bahasa Python untuk olah data besar, visualisasi grafik interaktif, dan pembersihan dataset yang kompleks.',
+    syllabus: [
+      'Dasar sintaks Python & struktur data',
+      'Library Pandas untuk manipulasi data',
+      'Visualisasi data dengan Matplotlib',
+      'Studi kasus: analisis dataset nyata',
+    ],
+    prereq: 'Tidak ada prasyarat khusus — cocok untuk pemula.',
+  },
+  {
+    id: 'python-analysis',
+    title: 'Python Fundamental & Data Analysis',
+    category: 'Data Science',
+    icon: 'fa-brands fa-python',
+    difficulty: 'pemula',
+    modules: 12,
+    hours: 18,
+    price: 0,
+    popular: true,
+    description: 'Kuasai bahasa Python untuk olah data besar, visualisasi grafik interaktif, dan pembersihan dataset complex.',
+    syllabus: [
+      'Dasar sintaks Python & struktur data',
+      'Library Pandas untuk manipulasi data',
+      'Visualisasi data dengan Matplotlib',
+      'Studi kasus: analisis dataset nyata',
+    ],
+    prereq: 'Tidak ada prasyarat khusus — cocok untuk pemula.',
+  },
+  {
+    id: 'ml-predictive',
+    title: 'Machine Learning & Predictive Modeling',
+    category: 'Data Science',
+    icon: 'fa-solid fa-brain',
+    difficulty: 'menengah',
+    modules: 18,
+    hours: 30,
+    price: 275000,
+    popular: false,
+    description: 'Pelajari konsep machine learning dan bangun model prediktif menggunakan algoritma populer di industri.',
+    syllabus: [
+      'Konsep supervised & unsupervised learning',
+      'Regresi linear & klasifikasi',
+      'Evaluasi model & tuning parameter',
+      'Studi kasus: prediksi menggunakan scikit-learn',
+    ],
+    prereq: 'Menguasai Python dasar dan konsep statistika sederhana.',
+  },
+  {
+    id: 'uiux-figma',
+    title: 'UI/UX Design Systems & Figma Essentials',
+    category: 'UI/UX Design',
+    icon: 'fa-solid fa-pen-nib',
+    difficulty: 'pemula',
+    modules: 10,
+    hours: 12,
+    price: 99000,
+    popular: false,
+    description: 'Pahami prinsip dasar UI/UX design dan bangun design system yang konsisten menggunakan Figma.',
+    syllabus: [
+      'Prinsip dasar UI/UX & user research',
+      'Membangun design system: warna, tipografi, komponen',
+      'Wireframing & prototyping di Figma',
+      'Studi kasus: mendesain aplikasi mobile',
+    ],
+    prereq: 'Tidak ada prasyarat khusus — cocok untuk pemula.',
+  },
+  {
+    id: 'ethical-hacking',
+    title: 'Cyber Security & Network Defense',
+    category: 'Cyber Security',
+    icon: 'fa-solid fa-shield-halved',
+    difficulty: 'menengah',
+    modules: 16,
+    hours: 25,
+    price: 250000,
+    popular: true,
+    description: 'Pahami konsep pertahanan jaringan, identifikasi celah keamanan web (OWASP Top 10), dan dasar kriptografi modern.',
+    syllabus: [
+      'Konsep dasar keamanan jaringan',
+      'OWASP Top 10: celah keamanan web umum',
+      'Dasar kriptografi & enkripsi data',
+      'Studi kasus: audit keamanan aplikasi sederhana',
+    ],
+    prereq: 'Memahami dasar jaringan komputer dan pemrograman web.',
+  },
+];
+
+const DIFFICULTY_LABEL = {
+  pemula: 'Pemula',
+  menengah: 'Menengah',
+  mahir: 'Mahir',
+};
+
+function formatPrice(price) {
+  if (price === 0) return 'Gratis';
+  return 'Rp' + price.toLocaleString('id-ID');
+}
+
+    </script>
+
+    <script>
+/* ==========================================================================
+   js/cards.js
+   --------------------------------------------------------------------------
+   Merender card "Materi Terpopuler" (item dengan popular:true di data.js)
+   ke dalam #materi-cards-container. Setiap card punya tombol "Detail Materi"
+   yang membuka modal (lihat modal.js).
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  function renderMateriCards() {
+    const container = document.getElementById('materi-cards-container');
+    if (!container) return;
+
+    const popularItems = materiData.filter(function (item) {
+      return item.popular;
+    });
+
+    container.innerHTML = popularItems
+      .map(function (item, index) {
+        const style = getCategoryStyle(item.category);
+        return (
+          '<div class="materi-card">' +
+            '<div class="materi-card__image" style="background:' + style.gradient + '">' +
+              '<span class="materi-card__badge" style="color:' + style.accent + '">' + item.category + '</span>' +
+              '<i class="' + item.icon + ' materi-card__icon" style="color:' + style.accent + '"></i>' +
+            '</div>' +
+            '<div class="materi-card__body">' +
+              '<h3 class="materi-card__title">' + item.title + '</h3>' +
+              '<p class="materi-card__desc">' + item.description + '</p>' +
+              '<div class="materi-card__divider"></div>' +
+              '<button class="btn btn-primary materi-card__btn" data-materi-id="' + item.id + '">' +
+                'Detail Materi' +
+              '</button>' +
+            '</div>' +
+          '</div>'
+        );
+      })
+      .join('');
+
+    container.querySelectorAll('[data-materi-id]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const item = materiData.find(function (m) {
+          return m.id === btn.getAttribute('data-materi-id');
+        });
+        if (item && window.openMateriModal) window.openMateriModal(item);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', renderMateriCards);
+})();
+
+    </script>
+
+    <script>
+/* ==========================================================================
+   js/modal.js
+   --------------------------------------------------------------------------
+   Mengisi dan menampilkan/menyembunyikan #modal-detail. Diekspos sebagai
+   window.openMateriModal(item) supaya bisa dipanggil dari cards.js maupun
+   table.js. Semua logic di-scope ke elemen modal saja.
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  let lastFocusedElement = null;
+
+  function openMateriModal(item) {
+    const modal = document.getElementById('modal-detail');
+    if (!modal) return;
+
+    lastFocusedElement = document.activeElement;
+
+    document.getElementById('modal-img').style.background = getCategoryStyle(item.category).gradient;
+    document.getElementById('modal-category').textContent = item.category;
+    document.getElementById('modal-title').textContent = item.title;
+    document.getElementById('modal-desc').textContent = item.description;
+    document.getElementById('modal-prereq').textContent = item.prereq;
+
+    const syllabusList = document.getElementById('modal-syllabus');
+    syllabusList.innerHTML = item.syllabus
+      .map(function (point) {
+        return '<li><i class="fa-solid fa-check"></i> ' + point + '</li>';
+      })
+      .join('');
+
+    modal.setAttribute('aria-hidden', 'false');
+    modal.classList.add('is-open');
+    document.body.classList.add('modal-open');
+
+    const closeBtn = document.getElementById('modal-close');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeMateriModal() {
+    const modal = document.getElementById('modal-detail');
+    if (!modal) return;
+
+    modal.setAttribute('aria-hidden', 'true');
+    modal.classList.remove('is-open');
+    document.body.classList.remove('modal-open');
+
+    if (lastFocusedElement) lastFocusedElement.focus();
+  }
+
+  function initModal() {
+    const modal = document.getElementById('modal-detail');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('modal-close');
+    const cancelBtn = document.getElementById('modal-btn-cancel');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeMateriModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeMateriModal);
+
+    // Klik area gelap di luar modal-container menutup modal
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeMateriModal();
+    });
+
+    // ESC menutup modal
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+        closeMateriModal();
+      }
+    });
+  }
+
+  window.openMateriModal = openMateriModal;
+  window.closeMateriModal = closeMateriModal;
+
+  document.addEventListener('DOMContentLoaded', initModal);
+})();
+
+    </script>
+
+    <script>
+/* ==========================================================================
+   js/table.js
+   --------------------------------------------------------------------------
+   Merender seluruh materiData ke dalam #table-body, plus fitur search
+   (nama materi/kategori) dan filter tingkat kesulitan yang bekerja secara
+   live tanpa reload halaman.
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  function difficultyBadge(level) {
+    const iconMap = { pemula: 'fa-seedling', menengah: 'fa-layer-group', mahir: 'fa-fire' };
+    return (
+      '<span class="badge badge--' + level + '">' +
+        '<i class="fa-solid ' + iconMap[level] + '"></i> ' + DIFFICULTY_LABEL[level] +
+      '</span>'
+    );
+  }
+
+  function renderRows(items) {
+    const tbody = document.getElementById('table-body');
+    if (!tbody) return;
+
+    if (items.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Tidak ada materi yang cocok dengan pencarian.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = items
+      .map(function (item, index) {
+        const delay = Math.min(index * 40, 320);
+        return (
+          '<tr data-materi-id="' + item.id + '" style="animation-delay:' + delay + 'ms">' +
+            '<td>' + String(index + 1).padStart(2, '0') + '</td>' +
+            '<td class="table-materi-name">' +
+              '<span class="table-icon"><i class="' + item.icon + '"></i></span>' +
+              '<span>' + item.title + '</span>' +
+            '</td>' +
+            '<td>' + item.category + '</td>' +
+            '<td>' + difficultyBadge(item.difficulty) + '</td>' +
+            '<td>' + item.modules + ' Modul (' + item.hours + ' Jam)</td>' +
+            '<td class="table-price ' + (item.price === 0 ? 'table-price--free' : '') + '">' + formatPrice(item.price) + '</td>' +
+          '</tr>'
+        );
+      })
+      .join('');
+  }
+
+  function applyFilters() {
+    const searchInput = document.getElementById('table-search-input');
+    const difficultySelect = document.getElementById('filter-difficulty');
+
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const difficulty = difficultySelect ? difficultySelect.value : 'all';
+
+    const filtered = materiData.filter(function (item) {
+      const matchesQuery =
+        query === '' ||
+        item.title.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query);
+      const matchesDifficulty = difficulty === 'all' || item.difficulty === difficulty;
+      return matchesQuery && matchesDifficulty;
+    });
+
+    renderRows(filtered);
+  }
+
+  function initTable() {
+    const tbody = document.getElementById('table-body');
+    if (!tbody) return;
+
+    renderRows(materiData);
+
+    const searchInput = document.getElementById('table-search-input');
+    const difficultySelect = document.getElementById('filter-difficulty');
+
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (difficultySelect) difficultySelect.addEventListener('change', applyFilters);
+
+    tbody.addEventListener('click', function (e) {
+      const row = e.target.closest('tr[data-materi-id]');
+      if (!row) return;
+      const item = materiData.find(function (m) {
+        return m.id === row.getAttribute('data-materi-id');
+      });
+      if (item && window.openMateriModal) window.openMateriModal(item);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initTable);
+})();
+
+    </script>
+
+    <script>
+/* ==========================================================================
+   js/main.js
+   --------------------------------------------------------------------------
+   Interaksi lintas-halaman yang tidak spesifik ke satu section (bukan milik
+   cards.js / modal.js / table.js). Saat ini: smooth-scroll ke anchor link
+   dengan offset supaya konten tidak tertutup floating navbar Section 1.
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  const NAVBAR_OFFSET = 90;
+
+  function initSmoothAnchorScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        const targetId = link.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+
+        const target = document.querySelector(targetId);
+        if (!target) return;
+
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.pageYOffset - NAVBAR_OFFSET;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      });
+    });
+  }
+
+  /* ----------------------------------------------------------------
+     Scroll reveal — Section 2, 4, 5 (Section 1 & 3 punya animasinya
+     sendiri masing-masing). Elemen dengan [data-reveal] akan fade-up
+     saat masuk viewport, sekali saja per elemen.
+  ---------------------------------------------------------------- */
+  function initScrollReveal() {
+    const targets = document.querySelectorAll('[data-reveal]');
+    if (targets.length === 0) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+      targets.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    targets.forEach(function (el) { observer.observe(el); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initSmoothAnchorScroll();
+    initScrollReveal();
+  });
+})();
+
+    </script>
+
+    <script>
+/* ==========================================================================
+   js/interactions.js
+   --------------------------------------------------------------------------
+   Implementasi "Liquid Glass Interaction System" secara vanilla JS (tanpa
+   framework/Framer Motion, karena project ini HTML+CSS+JS murni). Semua
+   fitur di sini bersifat ENHANCEMENT — tidak mengubah struktur/konten,
+   cuma menambah motion & depth di atas markup yang sudah ada.
+
+   Fitur:
+   1. Cursor spotlight (mengikuti kursor, lembut, hanya desktop)
+   2. Scroll progress bar tipis di atas viewport
+   3. Sliding glass indicator pada navbar Section 1
+   4. Card tilt 3D + spotlight radial + magnetic ringan (.materi-card)
+   5. Magnetic button pada CTA utama
+   6. Parallax halus pada thumbnail video sebelum diputar
+
+   Semua fitur di atas OTOMATIS NONAKTIF jika:
+   - prefers-reduced-motion: reduce
+   - device tidak punya hover presisi (touch/mobile)
+   sesuai instruksi accessibility & responsive behavior.
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const canAnimate = !prefersReducedMotion && hasFinePointer;
+
+  document.body.setAttribute('data-reduced-motion', String(prefersReducedMotion));
+  document.body.setAttribute('data-no-hover', String(!hasFinePointer));
+
+  /* ------------------------------------------------------------------
+     1. CURSOR SPOTLIGHT
+  ------------------------------------------------------------------ */
+  function initCursorGlow() {
+    if (!canAnimate) return;
+
+    const glow = document.createElement('div');
+    glow.className = 'cursor-glow';
+    document.body.appendChild(glow);
+
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let currentX = targetX;
+    let currentY = targetY;
+    let ticking = false;
+
+    function loop() {
+      // Lerp sederhana supaya terasa seperti spring/inertia yang lembut
+      currentX += (targetX - currentX) * 0.14;
+      currentY += (targetY - currentY) * 0.14;
+      glow.style.transform = 'translate3d(' + currentX + 'px,' + currentY + 'px,0)';
+
+      if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
+        window.requestAnimationFrame(loop);
+      } else {
+        ticking = false;
+      }
+    }
+
+    window.addEventListener('pointermove', function (e) {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(loop);
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     2. SCROLL PROGRESS BAR
+  ------------------------------------------------------------------ */
+  function initScrollProgress() {
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    document.body.appendChild(bar);
+
+    let ticking = false;
+
+    function update() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      bar.style.width = pct + '%';
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    });
+
+    update();
+  }
+
+  /* ------------------------------------------------------------------
+     3. NAVBAR SLIDING GLASS INDICATOR (Section 1 hero navbar)
+  ------------------------------------------------------------------ */
+  function initNavIndicator() {
+    const nav = document.querySelector('.about-hero-navbar, section.relative.flex.min-h-screen nav');
+    const navEl = document.querySelector('section nav.flex.w-full.max-w-3xl');
+    const target = navEl || nav;
+    if (!target || !canAnimate) return;
+
+    const links = target.querySelectorAll('div.hidden.items-center.gap-7 a');
+    if (links.length === 0) return;
+
+    const indicator = document.createElement('div');
+    indicator.className = 'nav-glass-indicator';
+    target.appendChild(indicator);
+    target.style.position = 'relative';
+
+    function moveTo(el) {
+      const navRect = target.getBoundingClientRect();
+      const linkRect = el.getBoundingClientRect();
+      indicator.style.width = linkRect.width + 16 + 'px';
+      indicator.style.height = linkRect.height + 10 + 'px';
+      indicator.style.transform =
+        'translate(' + (linkRect.left - navRect.left - 8) + 'px,' + (linkRect.top - navRect.top - 5) + 'px)';
+      indicator.style.opacity = '1';
+    }
+
+    links.forEach(function (link) {
+      link.style.position = 'relative';
+      link.style.zIndex = '1';
+      link.addEventListener('mouseenter', function () { moveTo(link); });
+    });
+
+    target.addEventListener('mouseleave', function () {
+      indicator.style.opacity = '0';
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     4. CARD TILT + SPOTLIGHT + MAGNETIC (.materi-card)
+  ------------------------------------------------------------------ */
+  function initCardTilt() {
+    const cards = document.querySelectorAll('.materi-card');
+    if (cards.length === 0) return;
+
+    cards.forEach(function (card) {
+      if (!canAnimate) return;
+
+      card.addEventListener('mousemove', function (e) {
+        const rect = card.getBoundingClientRect();
+        const relX = (e.clientX - rect.left) / rect.width;
+        const relY = (e.clientY - rect.top) / rect.height;
+
+        // Spotlight position (persen, dipakai radial-gradient di CSS)
+        card.style.setProperty('--mx', relX * 100 + '%');
+        card.style.setProperty('--my', relY * 100 + '%');
+
+        // Tilt ringan, maksimum ±3deg
+        const rotateY = (relX - 0.5) * 6;
+        const rotateX = (0.5 - relY) * 6;
+
+        card.style.transform =
+          'perspective(900px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-5px) scale(1.012)';
+      });
+
+      card.addEventListener('mouseleave', function () {
+        card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)';
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     5. MAGNETIC BUTTONS (CTA utama)
+  ------------------------------------------------------------------ */
+  function initMagneticButtons() {
+    if (!canAnimate) return;
+
+    const selectors = [
+      '.about-btn--primary',
+      '.cta-pill',
+      '.materi-card__btn',
+      '#modal-link-external',
+    ];
+    const buttons = document.querySelectorAll(selectors.join(','));
+
+    buttons.forEach(function (btn) {
+      let raf = null;
+
+      btn.addEventListener('mousemove', function (e) {
+        const rect = btn.getBoundingClientRect();
+        const relX = e.clientX - (rect.left + rect.width / 2);
+        const relY = e.clientY - (rect.top + rect.height / 2);
+
+        const moveX = Math.max(-8, Math.min(8, relX * 0.25));
+        const moveY = Math.max(-8, Math.min(8, relY * 0.25));
+
+        if (raf) window.cancelAnimationFrame(raf);
+        raf = window.requestAnimationFrame(function () {
+          btn.style.transform = 'translate(' + moveX + 'px,' + moveY + 'px)';
+        });
+      });
+
+      btn.addEventListener('mouseleave', function () {
+        if (raf) window.cancelAnimationFrame(raf);
+        btn.style.transform = 'translate(0,0)';
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     6. VIDEO THUMBNAIL PARALLAX (sebelum diputar)
+  ------------------------------------------------------------------ */
+  function initVideoParallax() {
+    const wrapper = document.getElementById('player-wrapper');
+    if (!wrapper || !canAnimate) return;
+
+    wrapper.addEventListener('mousemove', function (e) {
+      const facade = wrapper.querySelector('#facade-thumb');
+      if (!facade) return;
+
+      const rect = wrapper.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+
+      facade.style.transform = 'scale(1.04) translate(' + relX * -8 + 'px,' + relY * -8 + 'px)';
+    });
+
+    wrapper.addEventListener('mouseleave', function () {
+      const facade = wrapper.querySelector('#facade-thumb');
+      if (facade) facade.style.transform = '';
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Init — beberapa fitur perlu delay kecil karena elemen target
+     (materi-card, player-wrapper) baru ada setelah cards.js/video
+     initializer selesai me-render innerHTML masing-masing.
+  ------------------------------------------------------------------ */
+  function init() {
+    initCursorGlow();
+    initScrollProgress();
+    initNavIndicator();
+
+    // Beri jeda 1 tick supaya elemen dinamis (card materi, player video)
+    // sudah selesai dirender oleh script lain sebelum kita pasang listener.
+    window.setTimeout(function () {
+      initCardTilt();
+      initMagneticButtons();
+      initVideoParallax();
+    }, 0);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+    </script>
+
+    <!-- ==========================================
+         Script Section 1: Hero About Us — parallax ilustrasi
+         (Sebaiknya nanti dipindah ke file terpisah js/hero.js)
+         ========================================== -->
+    <script>
+    (function () {
+      'use strict';
+
+      var hero = document.querySelector('#hero-illustration');
+      var section = hero ? hero.closest('section') : null;
+      if (!hero || !section) return;
+
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+      if (prefersReducedMotion || !hasFinePointer) return;
+
+      var ticking = false;
+      var lastX = 0;
+      var lastY = 0;
+
+      function applyParallax() {
+        hero.style.transform = 'translate(' + lastX + 'px,' + lastY + 'px)';
+        ticking = false;
+      }
+
+      section.addEventListener('pointermove', function (e) {
+        var rect = section.getBoundingClientRect();
+        var relX = (e.clientX - rect.left) / rect.width - 0.5;
+        var relY = (e.clientY - rect.top) / rect.height - 0.5;
+
+        lastX = relX * -16;
+        lastY = relY * -12;
+
+        if (!ticking) {
+          window.requestAnimationFrame(applyParallax);
+          ticking = true;
+        }
+      });
+
+      section.addEventListener('pointerleave', function () {
+        lastX = 0;
+        lastY = 0;
+        window.requestAnimationFrame(applyParallax);
+      });
+    })();
+    </script>
+
+    <!-- ==========================================
+         Script Section 3: Video Blog — player, tabs, seek
+         (Sebaiknya nanti dipindah ke file terpisah js/video.js)
+         ========================================== -->
+    <script>
+    (function () {
+      'use strict';
+
+      const VIDEO = {
+        // Ganti dengan ID video YouTube asli. Thumbnail facade otomatis mengikuti ID ini.
+        youtubeId: 'VIDEO_ID_HERE',
+        title: '[Vlog Presentasi UAS Pemrograman Web I] - EdukasiTekno: Platform Pembelajaran Teknologi Modern',
+        description:
+          'Video ini berisi dokumentasi pengerjaan, demonstrasi fitur, serta penjelasan arsitektur source code aplikasi web EdukasiTekno. Web ini dikembangkan sebagai platform edukasi digital modern yang menyajikan modul interaktif dan katalog pembelajaran teknologi.',
+        releaseDate: '2026-06-12',
+        tags: ['#UAS', '#PemrogramanWebI', '#EdukasiTekno'],
+        speaker: { name: 'aajinabil18', role: 'Senior Frontend Engineer', initials: 'AJ' },
+        taskInfo: [
+          { label: 'Mata Kuliah', value: 'Pemrograman Web I (IF210)' },
+          { label: 'Program Studi', value: 'PJJ Informatika — Universitas Siber Asia' },
+          { label: 'Dosen Pengampu', value: 'Riad Sahara, S.SI., M.T.' },
+          { label: 'Anggota Kelompok', value: 'Lulu Maulana Malik, A. M. Nabil Aiendra Dzikra, Abdul Majid' },
+        ],
+        implementationPoints: [
+          {
+            title: 'Struktur HTML5 Lengkap',
+            description: 'Penerapan Heading, Paragraph, Text Formatting, Link, List, Table (katalog harga & modul), Form interaktif, serta embed Media (Audio & Video Player Facade).',
+          },
+          {
+            title: 'Styling & Template',
+            description: 'Menggunakan Tailwind CSS kustom dengan tema Modern Dark Aesthetic/Glassmorphism yang konsisten dan fully responsive di berbagai ukuran layar.',
+          },
+          {
+            title: 'Elemen JavaScript',
+            description: 'Manipulasi DOM untuk navigasi tab interaktif (About/Summary/Transkrip), filtering/search, serta seek-timestamp player secara dinamis.',
+          },
+        ],
+        // Ganti dengan link repository asli (GitHub/GitLab)
+        repoLink: '#',
+        keyTakeaways: [
+          'Konsep utama di balik efek "liquid glass" dan kapan sebaiknya dipakai.',
+          'Cara menyusun lapisan blur, border, dan glow tanpa membebani performa render.',
+          'Pola komponen reusable untuk card, modal, dan navigasi bergaya glassmorphism.',
+          'Tips aksesibilitas: kontras teks tetap terjaga di atas background transparan.',
+        ],
+        chapters: [
+          { time: 0, label: '00:00', title: 'Pembukaan' },
+          { time: 135, label: '02:15', title: 'Pengenalan Design System' },
+          { time: 320, label: '05:20', title: 'Lapisan Blur & Transparansi' },
+          { time: 540, label: '09:00', title: 'Border & Glow Halus' },
+          { time: 760, label: '12:40', title: 'Studi Kasus: Card & Modal' },
+          { time: 980, label: '16:20', title: 'Penutup & Rekomendasi' },
+        ],
+        transcript: [
+          { time: 0, label: '00:00', text: 'Halo semuanya, selamat datang kembali di seri video pengembangan web kita.' },
+          { time: 18, label: '00:18', text: 'Hari ini kita akan membahas tren desain yang sedang naik daun: liquid glass.' },
+          { time: 135, label: '02:15', text: 'Liquid glass pada dasarnya adalah kombinasi dari blur, transparansi, dan pencahayaan tipis di tepi elemen.' },
+          { time: 320, label: '05:20', text: 'Mari kita mulai dari lapisan paling dasar: backdrop-filter blur dan bagaimana browser merender lapisan ini.' },
+          { time: 540, label: '09:00', text: 'Selanjutnya, border tipis dengan opacity rendah memberi kesan "kaca" tanpa membuat elemen terlihat berat.' },
+          { time: 760, label: '12:40', text: 'Kita terapkan pola ini pada komponen card dan modal supaya konsisten di seluruh produk.' },
+          { time: 980, label: '16:20', text: 'Sebagai penutup, berikut beberapa rekomendasi bacaan dan resource tambahan.' },
+        ],
+        resources: [
+          { title: 'Starter Component — Glass Card', description: 'Kode React + Tailwind siap pakai untuk komponen card bergaya liquid glass.', href: 'https://github.com/', type: 'code' },
+          { title: 'Dokumentasi backdrop-filter (MDN)', description: 'Referensi lengkap dukungan browser dan performa backdrop-filter.', href: 'https://developer.mozilla.org/', type: 'doc' },
+          { title: 'Design Tokens — Figma Community File', description: 'File Figma berisi token warna, radius, dan efek glass yang dipakai di video ini.', href: 'https://figma.com/', type: 'link' },
+        ],
+      };
+
+      const RESOURCE_ICONS = { code: 'code-2', doc: 'file-text', link: 'external-link' };
+
+      const state = {
+        hasPlayed: false,
+        startAt: 0,
+        activeTab: 'about',
+      };
+
+      const TABS = [
+        { key: 'about', label: 'About' },
+        { key: 'summary', label: 'Summary' },
+        { key: 'transcript', label: 'Transkrip' },
+        { key: 'resource', label: 'Resource / Code' },
+      ];
+
+      function formatDate(iso) {
+        const d = new Date(iso);
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderPlayer() {
+        const wrapper = document.getElementById('player-wrapper');
+
+        if (state.hasPlayed) {
+          const src =
+            'https://www.youtube.com/embed/' + VIDEO.youtubeId +
+            '?rel=0&modestbranding=1&autoplay=1' +
+            (state.startAt ? '&start=' + state.startAt : '');
+
+          wrapper.innerHTML =
+            '<iframe src="' + src + '" title="' + escapeHtml(VIDEO.title) + '" ' +
+            'class="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          return;
+        }
+
+        wrapper.innerHTML =
+          '<button type="button" onclick="VD.playVideo()" aria-label="Putar video: ' + escapeHtml(VIDEO.title) + '" class="group relative h-full w-full">' +
+            '<img id="facade-thumb" src="https://img.youtube.com/vi/' + VIDEO.youtubeId + '/maxresdefault.jpg" alt="' + escapeHtml(VIDEO.title) + '" ' +
+              'class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" ' +
+              'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + VIDEO.youtubeId + '/hqdefault.jpg\';">' +
+            '<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10"></div>' +
+            '<span class="absolute inset-0 flex items-center justify-center">' +
+              '<span class="relative flex h-20 w-20 items-center justify-center">' +
+                '<span class="absolute inset-0 animate-ping rounded-full bg-white/20"></span>' +
+                '<span class="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/30 bg-white/10 backdrop-blur-md transition group-hover:scale-110 group-hover:bg-white/20">' +
+                  '<svg class="ml-1 h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
+                '</span>' +
+              '</span>' +
+            '</span>' +
+          '</button>';
+      }
+
+      function playVideo(seconds) {
+        state.startAt = seconds || 0;
+        state.hasPlayed = true;
+        renderPlayer();
+      }
+
+      function seekTo(seconds) {
+        state.startAt = seconds;
+        state.hasPlayed = true;
+        renderPlayer();
+        const anchor = document.getElementById('video-player-anchor');
+        if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function renderTabBar() {
+        const el = document.getElementById('tab-bar');
+        el.innerHTML = TABS.map(function (tab) {
+          const isActive = tab.key === state.activeTab;
+          return (
+            '<button role="tab" aria-selected="' + isActive + '" onclick="VD.setActiveTab(\'' + tab.key + '\')" ' +
+            'class="shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition duration-200 ' +
+            (isActive
+              ? 'border-indigo-400/50 bg-indigo-500/15 text-white'
+              : 'border-slate-800/80 bg-[#131728] text-zinc-400 hover:border-slate-700 hover:text-zinc-200') + '">' +
+            tab.label + '</button>'
+          );
+        }).join('');
+      }
+
+      function setActiveTab(tab) {
+        state.activeTab = tab;
+        renderTabBar();
+        renderTabContent();
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      function renderTabContent() {
+        const el = document.getElementById('tab-content');
+        el.className = 'mt-6 vd-fade-up';
+
+        if (state.activeTab === 'about') el.innerHTML = tplAbout();
+        else if (state.activeTab === 'summary') el.innerHTML = tplSummary();
+        else if (state.activeTab === 'transcript') el.innerHTML = tplTranscript();
+        else if (state.activeTab === 'resource') el.innerHTML = tplResource();
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      function tplAbout() {
+        const tags = VIDEO.tags.map(function (t) {
+          return '<span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300">' + escapeHtml(t) + '</span>';
+        }).join('');
+
+        const implementationPoints = VIDEO.implementationPoints.map(function (point, i) {
+          return (
+            '<li class="flex gap-3">' +
+              '<span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 text-xs font-bold text-indigo-300">' + (i + 1) + '</span>' +
+              '<div>' +
+                '<div class="text-sm font-semibold text-white">' + escapeHtml(point.title) + '</div>' +
+                '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(point.description) + '</p>' +
+              '</div>' +
+            '</li>'
+          );
+        }).join('');
+
+        const taskInfo = VIDEO.taskInfo.map(function (item) {
+          return (
+            '<div>' +
+              '<div class="text-[11px] uppercase tracking-wider text-zinc-500">' + escapeHtml(item.label) + '</div>' +
+              '<div class="mt-1 text-sm leading-relaxed text-zinc-300">' + escapeHtml(item.value) + '</div>' +
+            '</div>'
+          );
+        }).join('<div class="my-3 border-t border-slate-800/80"></div>');
+
+        return (
+          '<div class="grid grid-cols-1 gap-10 md:grid-cols-[1fr_280px]">' +
+            '<div>' +
+              '<p class="text-[15px] leading-relaxed text-zinc-300">' + escapeHtml(VIDEO.description) + '</p>' +
+              '<h3 class="mt-8 text-sm font-semibold text-white">Poin Implementasi Materi (Pertemuan 1–15)</h3>' +
+              '<ul class="mt-4 space-y-4">' + implementationPoints + '</ul>' +
+              '<a href="' + VIDEO.repoLink + '" target="_blank" rel="noopener noreferrer" ' +
+              'class="mt-8 inline-flex items-center gap-2 rounded-full border border-slate-800/80 bg-[#131728] px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-indigo-400/40 hover:text-white">' +
+                '<i data-lucide="github" class="h-4 w-4"></i>' +
+                'Link Repository Source Code' +
+              '</a>' +
+              '<div class="mt-6 flex flex-wrap gap-2">' + tags + '</div>' +
+            '</div>' +
+            '<div class="flex flex-col gap-4">' +
+              '<div class="flex flex-col gap-5 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
+                '<div class="flex items-center gap-3">' +
+                  '<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-sm font-bold text-white">' + VIDEO.speaker.initials + '</span>' +
+                  '<div>' +
+                    '<div class="text-sm font-semibold text-white">' + escapeHtml(VIDEO.speaker.name) + '</div>' +
+                    '<div class="text-xs text-zinc-500">' + escapeHtml(VIDEO.speaker.role) + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="border-t border-slate-800/80 pt-4">' +
+                  '<div class="text-[11px] uppercase tracking-wider text-zinc-500">Tanggal Rilis</div>' +
+                  '<div class="mt-1 text-sm text-zinc-300">' + formatDate(VIDEO.releaseDate) + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5">' +
+                '<div class="text-sm font-semibold text-white">Detail Tugas Akhir</div>' +
+                '<div class="mt-4">' + taskInfo + '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+
+      function tplSummary() {
+        const takeaways = VIDEO.keyTakeaways.map(function (point) {
+          return (
+            '<li class="flex items-start gap-3 text-sm text-zinc-300">' +
+              '<i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-indigo-400"></i>' +
+              '<span class="leading-relaxed">' + escapeHtml(point) + '</span>' +
+            '</li>'
+          );
+        }).join('');
+
+        const chapters = VIDEO.chapters.map(function (ch) {
+          return (
+            '<button onclick="VD.seekTo(' + ch.time + ')" class="group flex items-center gap-3 rounded-lg px-2 py-2.5 text-left transition hover:bg-white/5">' +
+              '<span class="w-12 shrink-0 font-mono text-xs text-indigo-400">' + ch.label + '</span>' +
+              '<span class="text-sm text-zinc-300 transition group-hover:text-white">' + escapeHtml(ch.title) + '</span>' +
+            '</button>'
+          );
+        }).join('');
+
+        return (
+          '<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">' +
+            '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
+              '<h3 class="text-sm font-semibold text-white">Key Takeaways</h3>' +
+              '<ul class="mt-4 space-y-3">' + takeaways + '</ul>' +
+            '</div>' +
+            '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6">' +
+              '<h3 class="text-sm font-semibold text-white">Chapter</h3>' +
+              '<div class="mt-3 flex flex-col divide-y divide-white/5">' + chapters + '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+
+      function tplTranscript() {
+        const lines = VIDEO.transcript.map(function (line) {
+          return (
+            '<div class="flex gap-4">' +
+              '<button onclick="VD.seekTo(' + line.time + ')" class="h-fit shrink-0 rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-indigo-400 transition hover:bg-white/10 hover:text-indigo-300">' + line.label + '</button>' +
+              '<p class="text-sm leading-relaxed text-zinc-300">' + escapeHtml(line.text) + '</p>' +
+            '</div>'
+          );
+        }).join('');
+
+        return '<div class="rounded-2xl border border-slate-800/80 bg-[#181C2E] p-6"><div class="flex flex-col gap-5">' + lines + '</div></div>';
+      }
+
+      function tplResource() {
+        const items = VIDEO.resources.map(function (r) {
+          return (
+            '<a href="' + r.href + '" target="_blank" rel="noopener noreferrer" ' +
+            'class="group flex items-start gap-4 rounded-2xl border border-slate-800/80 bg-[#181C2E] p-5 transition hover:border-indigo-400/40 hover:bg-white/[0.03]">' +
+              '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">' +
+                '<i data-lucide="' + (RESOURCE_ICONS[r.type] || 'link') + '" class="h-5 w-5"></i>' +
+              '</span>' +
+              '<div class="flex-1">' +
+                '<div class="text-sm font-semibold text-white">' + escapeHtml(r.title) + '</div>' +
+                '<p class="mt-1 text-sm leading-relaxed text-zinc-400">' + escapeHtml(r.description) + '</p>' +
+              '</div>' +
+              '<i data-lucide="chevron-right" class="mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-zinc-400"></i>' +
+            '</a>'
+          );
+        }).join('');
+
+        return '<div class="flex flex-col gap-3">' + items + '</div>';
+      }
+
+      function init() {
+        document.getElementById('video-title').textContent = VIDEO.title;
+        renderPlayer();
+        renderTabBar();
+        renderTabContent();
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      window.VD = { playVideo: playVideo, seekTo: seekTo, setActiveTab: setActiveTab };
+
+      init();
+    })();
+    </script>
+
 </body>
 
 </html>
