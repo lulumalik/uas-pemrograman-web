@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Responsive Breakpoints & Media Queries
+   ========================================================================== */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.75rem;
+  }
+  
+  .materi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .modal-container {
+    max-height: 95vh;
+  }
+}

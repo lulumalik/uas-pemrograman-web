@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Platform Edukasi Teknologi & Pemrograman Web Terintegrasi - Tugas UAS Pemrograman Web">
+    <title>EdukasiTekno - Platform Edukasi Pemrograman Web</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS (Modular Master File) -->
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <!-- ==========================================
+         SECTION 1: ABOUT US (NABIL)
+         ========================================== -->
+    <section id="section-about">
+        <div class="container">
+            <div class="section-placeholder">
+                <span class="placeholder-badge">Section 1</span>
+                <h3>About Us</h3>
+                <p>Bagian ini disediakan untuk <strong>Nabil</strong> (Profil Platform & Tentang Kami).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: DAFTAR LIST MATERI EDUKASI (LULU)
+         ========================================== -->
+    <section id="section-edukasi" class="section-edukasi">
+        <div class="container">
+            <!-- Section Heading -->
+            <div class="section-header">
+                <span class="section-badge"><i class="fa-solid fa-graduation-cap"></i> Katalog Pembelajaran</span>
+                <h2 class="section-title">Daftar Materi Edukasi Terpopuler</h2>
+                <p class="section-subtitle">
+                    Tingkatkan keahlian digital Anda dengan modul interaktif yang dirancang oleh praktisi industri.
+                    Pilih jalur belajar Anda hari ini.
+                </p>
+            </div>
+
+            <!-- Card List Grid Container (Dynamically rendered via js/cards.js) -->
+            <div class="materi-grid" id="materi-cards-container">
+                <!-- Data cards di-render dari js/data.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL DETAIL POPUP (Section 2 Element) -->
+    <div id="modal-detail" class="modal-overlay" aria-hidden="true" role="dialog">
+        <div class="modal-container">
+            <button class="modal-close-btn" id="modal-close" aria-label="Tutup Modal">&times;</button>
+            <img id="modal-img" src="" alt="Gambar Detail Materi" class="modal-header-img">
+
+            <div class="modal-body">
+                <span id="modal-category" class="modal-badge">Kategori</span>
+                <h3 id="modal-title" class="modal-title">Judul Materi Edukasi</h3>
+                <p id="modal-desc" class="modal-description">Deskripsi lengkap materi akan tampil di sini.</p>
+
+                <h4 class="modal-section-title"><i class="fa-solid fa-list-check"></i> Silabus & Topik Pembahasan</h4>
+                <ul id="modal-syllabus" class="modal-syllabus-list">
+                    <!-- Silabus diisi secara dinamis dari js/modal.js -->
+                </ul>
+
+                <h4 class="modal-section-title"><i class="fa-solid fa-shield-halved"></i> Prasarat Peserta</h4>
+                <p id="modal-prereq" class="modal-description" style="margin-bottom: 1.5rem;"></p>
+
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="modal-btn-cancel">Tutup</button>
+                    <a id="modal-link-external" href="https://www.w3schools.com/" target="_blank"
+                        class="btn btn-primary">
+                        <i class="fa-solid fa-external-link"></i> Pelajari Selengkapnya
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         SECTION 3: VIDEO BLOG WEB (NABIL)
+         ========================================== -->
+    <section id="section-videoblog">
+        <div class="container">
+            <div class="section-placeholder">
+                <span class="placeholder-badge">Section 3</span>
+                <h3>Video Blog Web</h3>
+                <p>Bagian ini disediakan untuk <strong>Nabil</strong> (Embed Youtube & Video Blog).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 4: TABLE LIST NAMA MATERI, HARGA, & TINGKAT KESULITAN (LULU)
+         ========================================== -->
+    <section id="section-table" class="section-table">
+        <div class="container">
+            <!-- Section Heading -->
+            <div class="section-header">
+                <span class="section-badge"><i class="fa-solid fa-table-list"></i> Tabel Informasi Materi</span>
+                <h2 class="section-title">Daftar Lengkap Harga & Tingkat Kesulitan</h2>
+                <p class="section-subtitle">
+                    Bandingkan seluruh materi edukasi yang tersedia berdasarkan biaya, jumlah modul, dan tingkat
+                    kesulitan belajar.
+                </p>
+            </div>
+
+            <!-- Table Toolbar (Search & Filter) -->
+            <div class="table-toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="table-search-input" class="search-input"
+                        placeholder="Cari nama materi atau kategori...">
+                </div>
+                <div class="table-filter-group">
+                    <label for="filter-difficulty" style="font-size: 0.85rem; color: var(--text-muted);"><i
+                            class="fa-solid fa-filter"></i></label>
+                    <select id="filter-difficulty" class="select-filter">
+                        <option value="all">Semua</option>
+                        <option value="pemula">Pemula</option>
+                        <option value="menengah">Menengah</option>
+                        <option value="mahir">Mahir</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="table-responsive-wrapper">
+                <table class="materi-table" id="materi-table-element">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">No</th>
+                            <th>Nama Materi Edukasi</th>
+                            <th>Kategori</th>
+                            <th>Tingkat Kesulitan</th>
+                            <th>Durasi / Modul</th>
+                            <th>Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Baris tabel di-render dinamis dari js/table.js -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 5: FORM INPUT UNTUK FEEDBACK (MAJID)
+         ========================================== -->
+    <section id="section-feedback">
+        <div class="container">
+            <div class="section-placeholder">
+                <span class="placeholder-badge">Section 5</span>
+                <h3>Form Input Feedback</h3>
+                <p>Bagian ini disediakan untuk <strong>Majid</strong> (Form Input & Feedback User).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         MODULAR JAVASCRIPT SCRIPTS
+         ========================================== -->
+    <script src="js/data.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
