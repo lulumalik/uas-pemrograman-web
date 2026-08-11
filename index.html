@@ -17,6 +17,13 @@
     <!-- FontAwesome Icons (dipakai Section 2, 4, 5) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Design Tokens (variables.css) — wajib sebelum modul lain -->
+    <link rel="stylesheet" href="css/variables.css">
+
+    <!-- Audio Intro Overlay & Section 5 Stylesheets -->
+    <link rel="stylesheet" href="css/audio-overlay.css">
+    <link rel="stylesheet" href="css/section5.css">
+
     <!-- Tailwind CSS CDN — WAJIB, dipakai oleh Section 1 (Hero About Us) & Section 3 (Video Blog) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -1036,6 +1043,75 @@ body.modal-open {
 <body>
 
     <!-- ==========================================
+         AUDIO INTRO OVERLAY
+         Overlay fullscreen saat web pertama dibuka.
+         Pakai Web Audio API (no external audio file).
+         ========================================== -->
+    <div id="audio-overlay" role="dialog" aria-modal="true" aria-label="Selamat datang">
+        <!-- Floating particles (rendered via JS) -->
+        <div class="ao-particles" id="ao-particles"></div>
+
+        <div class="ao-card">
+            <div class="ao-logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h1 class="ao-title">Edukasi<span>Tekno</span></h1>
+            <p class="ao-sub">Platform edukasi pemrograman web modern.<br>Aktifkan audio untuk pengalaman terbaik.</p>
+
+            <!-- Visualizer bars -->
+            <div class="ao-visualizer" id="ao-visualizer">
+                <div class="ao-bar" style="--dur:.6s;--h:14px"></div>
+                <div class="ao-bar" style="--dur:.9s;--h:28px"></div>
+                <div class="ao-bar" style="--dur:.7s;--h:36px"></div>
+                <div class="ao-bar" style="--dur:1.1s;--h:22px"></div>
+                <div class="ao-bar" style="--dur:.8s;--h:38px"></div>
+                <div class="ao-bar" style="--dur:.65s;--h:18px"></div>
+                <div class="ao-bar" style="--dur:.95s;--h:32px"></div>
+                <div class="ao-bar" style="--dur:.75s;--h:26px"></div>
+                <div class="ao-bar" style="--dur:1.0s;--h:14px"></div>
+            </div>
+
+            <div class="ao-btn-group">
+                <button class="ao-btn-enter" id="ao-btn-enter">
+                    <i class="fa-solid fa-volume-high"></i> Masuk dengan Musik
+                </button>
+                <button class="ao-btn-mute" id="ao-btn-mute">
+                    <i class="fa-solid fa-volume-xmark"></i> Masuk tanpa Suara
+                </button>
+                <div class="ao-volume-row" id="ao-volume-row" style="display:none;">
+                    <i class="fa-solid fa-volume-low"></i>
+                    <input type="range" class="ao-volume-slider" id="ao-volume" min="0" max="1" step="0.05" value="0.35">
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+            </div>
+
+            <div class="ao-now-playing" id="ao-now-playing">
+                <div class="ao-dot"></div> Ambient music playing
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         FLOATING AUDIO CONTROLLER (TOP RIGHT)
+         ========================================== -->
+    <div id="audio-floating-control" class="audio-floating-control" role="region" aria-label="Kontrol Suara Latar">
+        <button id="afc-btn-toggle" class="afc-btn-mute" title="Mute / Unmute Suara" aria-label="Toggle Mute">
+            <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <div class="afc-eq-bars" aria-hidden="true">
+            <span class="afc-eq-bar" style="--dur: 0.5s;"></span>
+            <span class="afc-eq-bar" style="--dur: 0.8s;"></span>
+            <span class="afc-eq-bar" style="--dur: 0.6s;"></span>
+        </div>
+        <div class="afc-vol-wrap">
+            <input type="range" id="afc-vol-slider" class="afc-vol-slider" min="0" max="100" value="35" title="Atur Volume">
+        </div>
+    </div>
+
+    <!-- Hidden Container untuk YouTube Audio Player API -->
+    <div id="yt-player-container">
+        <div id="yt-player-element"></div>
+    </div>
+
+    <!-- ==========================================
          SECTION 1: ABOUT US (NABIL)
          ========================================== -->
     <section class="hero-animate-root relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950">
@@ -1363,12 +1439,183 @@ body.modal-open {
     <!-- ==========================================
          SECTION 5: FORM INPUT UNTUK FEEDBACK (MAJID)
          ========================================== -->
-    <section id="section-feedback">
+    <section id="section-feedback" class="section-feedback">
         <div class="container">
-            <div class="section-placeholder" data-reveal>
-                <span class="placeholder-badge">Section 5</span>
-                <h3>Form Input Feedback</h3>
-                <p>Bagian ini disediakan untuk <strong>Majid</strong> (Form Input & Feedback User).</p>
+
+            <!-- SECTION HEADER -->
+            <div class="feedback-section-header">
+                <span class="feedback-badge"><i class="fa-solid fa-star"></i> Ulasan Pengguna</span>
+                <h2 class="feedback-section-title">Ceritakan <span class="gradient-text">Pengalaman</span> Anda</h2>
+                <p class="feedback-section-sub">Masukan Anda adalah bahan bakar kami untuk terus berkembang. Setiap kata berarti.</p>
+            </div>
+
+            <div class="feedback-layout" data-reveal>
+                <!-- LEFT PANEL: Info & Stats -->
+                <div class="feedback-info">
+
+                    <div class="fb-info-card">
+                        <div class="fb-info-icon"><i class="fa-solid fa-comments"></i></div>
+                        <h3>Kenapa Feedback Anda Penting?</h3>
+                        <p>Setiap masukan membantu kami menyempurnakan materi, tampilan, dan fitur platform EdukasiTekno.</p>
+                    </div>
+
+                    <div class="fb-stats-grid">
+                        <div class="fb-stat-item">
+                            <span class="fb-stat-number">4.9<i class="fa-solid fa-star fb-stat-star"></i></span>
+                            <span class="fb-stat-label">Rating Rata-rata</span>
+                        </div>
+                        <div class="fb-stat-item">
+                            <span class="fb-stat-number">2.4K+</span>
+                            <span class="fb-stat-label">Ulasan Masuk</span>
+                        </div>
+                        <div class="fb-stat-item">
+                            <span class="fb-stat-number">98%</span>
+                            <span class="fb-stat-label">Kepuasan User</span>
+                        </div>
+                        <div class="fb-stat-item">
+                            <span class="fb-stat-number">&lt;24h</span>
+                            <span class="fb-stat-label">Respons Tim</span>
+                        </div>
+                    </div>
+
+                    <ul class="feedback-contact-list">
+                        <li>
+                            <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="contact-text">
+                                <span class="contact-label">Email Kami</span>
+                                <span class="contact-value">feedback@edukasitekno.id</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="contact-icon"><i class="fa-solid fa-headset"></i></div>
+                            <div class="contact-text">
+                                <span class="contact-label">Dukungan</span>
+                                <span class="contact-value">Tersedia 24/7</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="contact-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div class="contact-text">
+                                <span class="contact-label">Privasi</span>
+                                <span class="contact-value">Data Anda terlindungi</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="fb-testimonial-seed">
+                        <div class="fb-ts-quote"><i class="fa-solid fa-quote-left"></i></div>
+                        <p>"Platform terbaik untuk belajar pemrograman web! Materinya terstruktur dan mudah dipahami."</p>
+                        <div class="fb-ts-author">
+                            <div class="feed-avatar fb-ts-avatar">AR</div>
+                            <span>Ahmad Rizky &middot; <span class="fb-ts-stars">★★★★★</span></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT PANEL: Form Card -->
+                <div class="feedback-form-card">
+
+                    <div class="form-card-header">
+                        <h3><i class="fa-solid fa-pen-to-square"></i> Tulis Ulasan</h3>
+                        <span class="form-card-badge">Gratis &amp; Anonim</span>
+                    </div>
+
+                    <form id="feedback-form" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fb-name" class="form-label"><i class="fa-solid fa-user"></i> Nama Lengkap <span class="required">*</span></label>
+                                <input type="text" id="fb-name" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                                <span class="field-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="fb-email" class="form-label"><i class="fa-solid fa-envelope"></i> Alamat Email <span class="required">*</span></label>
+                                <input type="email" id="fb-email" class="form-control" placeholder="nama@email.com" required>
+                                <span class="field-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fb-course" class="form-label"><i class="fa-solid fa-book-open"></i> Materi / Topik</label>
+                                <select id="fb-course" class="form-control">
+                                    <option value="Umum">Umum / Lainnya</option>
+                                    <option value="HTML5 & CSS3">HTML5 & CSS3 Dasar</option>
+                                    <option value="JavaScript Modern">JavaScript ES6+ Modern</option>
+                                    <option value="Tailwind CSS">Tailwind CSS & UI</option>
+                                    <option value="React.js">React.js Frontend Development</option>
+                                </select>
+                            </div>
+                            <div class="form-group rating-wrapper">
+                                <div class="rating-label-row">
+                                    <label class="form-label"><i class="fa-solid fa-star"></i> Penilaian <span class="required">*</span></label>
+                                    <span id="star-label-text"></span>
+                                </div>
+                                <div class="star-rating-group">
+                                    <input type="radio" id="star5" name="rating" value="5">
+                                    <label for="star5" title="Luar Biasa">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4">
+                                    <label for="star4" title="Bagus">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3" title="Cukup">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2">
+                                    <label for="star2" title="Kurang">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1">
+                                    <label for="star1" title="Sangat Kurang">★</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label"><i class="fa-solid fa-tags"></i> Topik Masukan <span class="form-hint">(opsional)</span></label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="topics" value="Kualitas Materi">
+                                    <span class="check-box"><i class="fa-solid fa-check"></i></span>
+                                    <span>Kualitas Materi</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="topics" value="Desain Web">
+                                    <span class="check-box"><i class="fa-solid fa-check"></i></span>
+                                    <span>Tampilan & UI/UX</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="topics" value="Pengalaman Audio">
+                                    <span class="check-box"><i class="fa-solid fa-check"></i></span>
+                                    <span>Fitur Audio & Video</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fb-message" class="form-label"><i class="fa-solid fa-comment-dots"></i> Pesan & Saran <span class="required">*</span></label>
+                            <textarea id="fb-message" class="form-control" rows="4" placeholder="Tuliskan masukan, kesan, atau kritik membangun Anda di sini..." required></textarea>
+                            <span class="field-error"></span>
+                        </div>
+
+                        <button type="submit" id="feedback-submit-btn" class="btn-submit">
+                            <span class="btn-text"><i class="fa-solid fa-paper-plane"></i> Kirim Feedback</span>
+                            <span class="spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Mengirim...</span>
+                        </button>
+
+                        <div id="feedback-toast" class="feedback-toast">
+                            <i class="toast-icon"></i>
+                            <div class="toast-body"></div>
+                        </div>
+                    </form>
+
+                    <!-- Feed Hasil Feedback User -->
+                    <div class="feedback-feed-title">
+                        <i class="fa-solid fa-comments"></i> Feedback Terbaru dari Pengguna
+                    </div>
+                    <div id="feedback-feed">
+                        <div class="feed-empty">
+                            <i class="fa-regular fa-comment-dots"></i>
+                            Belum ada feedback. Jadilah yang pertama memberikan masukan!
+                        </div>
+                    </div>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
@@ -2523,6 +2770,10 @@ function formatPrice(price) {
       init();
     })();
     </script>
+
+    <!-- Audio Intro & Feedback Form Scripts -->
+    <script src="js/audio-intro.js"></script>
+    <script src="js/feedback.js"></script>
 
 </body>
 
