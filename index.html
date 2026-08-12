@@ -336,7 +336,6 @@
   <div id="modal-detail" class="modal-overlay" aria-hidden="true" role="dialog">
     <div class="modal-container">
       <button class="modal-close-btn" id="modal-close" aria-label="Tutup Modal">&times;</button>
-      <div id="modal-img" class="modal-header-img" role="img" aria-label="Gambar Detail Materi"></div>
       <div class="modal-body">
         <span id="modal-category" class="modal-badge">Kategori</span>
         <h3 id="modal-title" class="modal-title">Judul Materi Edukasi</h3>
@@ -349,9 +348,9 @@
         <p id="modal-prereq" class="modal-description" style="margin-bottom: 1.5rem;"></p>
         <div class="modal-actions">
           <button class="btn btn-outline" id="modal-btn-cancel">Tutup</button>
-          <a id="modal-link-external" href="https://www.w3schools.com/" target="_blank" class="btn btn-primary">
-            <i class="fa-solid fa-external-link"></i> Pelajari Selengkapnya
-          </a>
+          <button id="modal-link-external" class="btn btn-primary">
+            <i class="fa-solid fa-circle-play"></i> Tonton Video Learning
+          </button>
         </div>
       </div>
     </div>
@@ -870,7 +869,8 @@
 
         lastFocusedElement = document.activeElement;
 
-        document.getElementById('modal-img').style.background = getCategoryStyle(item.category).gradient;
+        const modalImg = document.getElementById('modal-img');
+        if (modalImg) modalImg.style.background = getCategoryStyle(item.category).gradient;
         document.getElementById('modal-category').textContent = item.category;
         document.getElementById('modal-title').textContent = item.title;
         document.getElementById('modal-desc').textContent = item.description;
@@ -908,9 +908,19 @@
 
         const closeBtn = document.getElementById('modal-close');
         const cancelBtn = document.getElementById('modal-btn-cancel');
+        const videoBtn = document.getElementById('modal-link-external');
 
         if (closeBtn) closeBtn.addEventListener('click', closeMateriModal);
         if (cancelBtn) cancelBtn.addEventListener('click', closeMateriModal);
+        if (videoBtn) {
+          videoBtn.addEventListener('click', function () {
+            closeMateriModal();
+            const target = document.getElementById('video-player-anchor') || document.getElementById('app-root');
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
 
         // Klik area gelap di luar modal-container menutup modal
         modal.addEventListener('click', function (e) {
@@ -1199,36 +1209,10 @@
       }
 
       /* ------------------------------------------------------------------
-         4. CARD TILT + SPOTLIGHT + MAGNETIC (.materi-card)
+         4. CARD TILT (DISABLED)
       ------------------------------------------------------------------ */
       function initCardTilt() {
-        const cards = document.querySelectorAll('.materi-card');
-        if (cards.length === 0) return;
-
-        cards.forEach(function (card) {
-          if (!canAnimate) return;
-
-          card.addEventListener('mousemove', function (e) {
-            const rect = card.getBoundingClientRect();
-            const relX = (e.clientX - rect.left) / rect.width;
-            const relY = (e.clientY - rect.top) / rect.height;
-
-            // Spotlight position (persen, dipakai radial-gradient di CSS)
-            card.style.setProperty('--mx', relX * 100 + '%');
-            card.style.setProperty('--my', relY * 100 + '%');
-
-            // Tilt ringan, maksimum ±3deg
-            const rotateY = (relX - 0.5) * 6;
-            const rotateX = (0.5 - relY) * 6;
-
-            card.style.transform =
-              'perspective(900px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-5px) scale(1.012)';
-          });
-
-          card.addEventListener('mouseleave', function () {
-            card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)';
-          });
-        });
+        // Disabled per request — no JS tilt or hover scale/translate on cards
       }
 
       /* ------------------------------------------------------------------
@@ -1238,23 +1222,23 @@
         if (!canAnimate) return;
 
         const selectors = [
-          '.about-btn--primary',
           '.cta-pill',
-          '.materi-card__btn',
           '#modal-link-external',
         ];
-        const buttons = document.querySelectorAll(selectors.join(','));
 
-        buttons.forEach(function (btn) {
+        selectors.forEach(function (sel) {
+          const btn = document.querySelector(sel);
+          if (!btn) return;
+
           let raf = null;
 
           btn.addEventListener('mousemove', function (e) {
             const rect = btn.getBoundingClientRect();
-            const relX = e.clientX - (rect.left + rect.width / 2);
-            const relY = e.clientY - (rect.top + rect.height / 2);
+            const relX = e.clientX - rect.left - rect.width / 2;
+            const relY = e.clientY - rect.top - rect.height / 2;
 
-            const moveX = Math.max(-8, Math.min(8, relX * 0.25));
-            const moveY = Math.max(-8, Math.min(8, relY * 0.25));
+            const moveX = relX * 0.15;
+            const moveY = relY * 0.15;
 
             if (raf) window.cancelAnimationFrame(raf);
             raf = window.requestAnimationFrame(function () {
@@ -1305,7 +1289,6 @@
         // Beri jeda 1 tick supaya elemen dinamis (card materi, player video)
         // sudah selesai dirender oleh script lain sebelum kita pasang listener.
         window.setTimeout(function () {
-          initCardTilt();
           initMagneticButtons();
           initVideoParallax();
         }, 0);

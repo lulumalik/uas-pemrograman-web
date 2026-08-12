@@ -18,12 +18,11 @@ function initModalModule() {
   function openModal(item) {
     if (!item) return;
 
-    modalTitle.textContent = item.title || 'Detail Materi';
-    modalCategory.textContent = item.category || 'Edukasi';
-    modalImg.src = item.img || '';
-    modalDesc.textContent = item.descFull || item.descShort || '';
-    modalPrereq.textContent = item.prereq || 'Tidak ada prasarat khusus.';
-    modalLinkExternal.href = item.linkExternal || 'https://www.w3schools.com/';
+    if (modalTitle) modalTitle.textContent = item.title || 'Detail Materi';
+    if (modalCategory) modalCategory.textContent = item.category || 'Edukasi';
+    if (modalImg) modalImg.src = item.img || '';
+    if (modalDesc) modalDesc.textContent = item.descFull || item.descShort || '';
+    if (modalPrereq) modalPrereq.textContent = item.prereq || 'Tidak ada prasarat khusus.';
 
     // Render syllabus
     modalSyllabus.innerHTML = '';
@@ -60,6 +59,16 @@ function initModalModule() {
 
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
   if (modalBtnCancel) modalBtnCancel.addEventListener('click', closeModal);
+
+  if (modalLinkExternal) {
+    modalLinkExternal.addEventListener('click', function () {
+      closeModal();
+      const videoAnchor = document.getElementById('video-player-anchor') || document.getElementById('app-root');
+      if (videoAnchor) {
+        videoAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 
   if (modalOverlay) {
     modalOverlay.addEventListener('click', function (e) {
