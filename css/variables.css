@@ -1,35 +1,85 @@
-/* ==========================================================================
-   CSS Variables & Design System Tokens
-   ========================================================================== */
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --accent: #06b6d4;
-  --accent-light: #e0f2fe;
-  --secondary: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  
-  --bg-body: #0f172a;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --bg-input: #0f172a;
-  --bg-modal: #1e293b;
-  
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dark: #0f172a;
-  --border-color: #334155;
-  --border-focus: #6366f1;
-  
-  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.3);
-  --shadow-lg: 0 20px 30px -10px rgba(0,0,0,0.5);
-  
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+   /* Background Utama */
+   --color-bg: #0B0D1B;
+   /* background paling gelap (body) */
+   --color-surface: #131728;
+   /* background card / panel */
+   --color-surface-2: #181C2E;
+   /* background modal / elevated */
+   --color-surface-3: #1E2540;
+   /* background input / hover */
+
+   /* Border */
+   --color-border: #26304A;
+   /* border default */
+   --color-border-focus: #3245eb;
+   /* border saat focus / aktif */
+
+   /* Primary (Indigo) — warna aksen utama */
+   --color-primary: #2840ac;
+   /* tombol, link, highlight */
+   --color-primary-dark: #1037b8;
+   /* hover state primary */
+   --color-primary-light: #4668fd;
+   /* lighter variant / teks */
+   --color-primary-glow: rgba(99, 102, 241, 0.35);
+   /* shadow/glow */
+
+   /* Accent / Secondary */
+   --color-accent: #38BDF8;
+   /* cyan accent (hero glow, link) */
+   --color-success: #34D399;
+   /* hijau: gratis, pemula, valid */
+   --color-warning: #F59E0B;
+   /* kuning: menengah, rating bintang */
+   --color-danger: #EF4444;
+   /* merah: mahir, error, required */
+
+   /* Text */
+   --color-text: #F8FAFC;
+   /* teks utama (putih bersih) */
+   --color-text-muted: #94A3B8;
+   /* teks sekunder / deskripsi */
+   --color-text-dim: #64748B;
+   /* teks paling redup (placeholder) */
+
+
+   /* Kompatibel dengan kode lama yang masih pakai nama lama */
+   --primary: var(--color-primary);
+   --primary-hover: var(--color-primary-dark);
+   --primary-light: var(--color-primary-light);
+   --accent: var(--color-accent);
+   --secondary: var(--color-success);
+   --warning: var(--color-warning);
+   --danger: var(--color-danger);
+
+   --bg-body: var(--color-bg);
+   --bg-card: var(--color-surface);
+   --bg-card-hover: var(--color-surface-3);
+   --bg-input: var(--color-bg);
+   --bg-modal: var(--color-surface-2);
+
+   --text-main: var(--color-text);
+   --text-muted: var(--color-text-muted);
+   --text-dark: var(--color-bg);
+   --border-color: var(--color-border);
+   --border-focus: var(--color-border-focus);
+
+   --font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+
+   --radius-sm: 8px;
+   --radius-md: 12px;
+   --radius-lg: 20px;
+   --radius-xl: 28px;
+   --radius-full: 9999px;
+
+   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+   --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+   --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+   --shadow-primary: 0 8px 20px -6px var(--color-primary-glow);
+
+   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   --transition-fast: all 0.15s ease;
+   --transition-spring: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }

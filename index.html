@@ -25,13 +25,15 @@
   <link rel="stylesheet" href="css/audio-overlay.css">
   <link rel="stylesheet" href="css/section5.css">
 
-  <!-- Tailwind CSS CDN — WAJIB, dipakai oleh Section 1 (Hero About Us) & Section 3 (Video Blog) -->
+  <!-- Tailwind CSS CDN — dipakai oleh Section 1 (Hero) & Section 3 (Video Blog) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
         },
       },
     };
@@ -248,8 +250,8 @@
         <div class="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
           <a href="#hero" class="transition hover:text-white">Home</a>
           <a href="#section-edukasi" class="transition hover:text-white">Katalog</a>
-          <a href="#visi-misi" class="transition hover:text-white">Tentang Kami</a>
-          <a href="#section-feedback" class="transition hover:text-white">Kontak</a>
+          <a href="#app-root" class="transition hover:text-white">Video Learning</a>
+          <a href="#section-feedback" class="transition hover:text-white">Feedback</a>
         </div>
       </nav>
     </div>
@@ -383,7 +385,7 @@
       <h1 id="video-title" class="mt-6 text-xl font-bold leading-snug text-white md:text-2xl"></h1>
 
       <div class="mt-6">
-        <div id="tab-bar" role="tablist" aria-label="Bagian video" class="flex flex-wrap gap-2"></div>
+        <div id="tab-bar" role="tablist" class="hidden"></div>
       </div>
 
       <div id="tab-content" class="mt-6"></div>
@@ -459,64 +461,7 @@
       </div>
 
       <div class="feedback-layout" data-reveal>
-        <!-- LEFT PANEL: Info & Stats -->
-        <div class="feedback-info">
-
-          <div class="fb-stats-grid">
-            <div class="fb-stat-item">
-              <span class="fb-stat-number">4.9<i class="fa-solid fa-star fb-stat-star"></i></span>
-              <span class="fb-stat-label">Rating Rata-rata</span>
-            </div>
-            <div class="fb-stat-item">
-              <span class="fb-stat-number">2.4K+</span>
-              <span class="fb-stat-label">Ulasan Masuk</span>
-            </div>
-            <div class="fb-stat-item">
-              <span class="fb-stat-number">98%</span>
-              <span class="fb-stat-label">Kepuasan User</span>
-            </div>
-            <div class="fb-stat-item">
-              <span class="fb-stat-number">&lt;24h</span>
-              <span class="fb-stat-label">Respons Tim</span>
-            </div>
-          </div>
-
-          <ul class="feedback-contact-list">
-            <li>
-              <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
-              <div class="contact-text">
-                <span class="contact-label">Email Kami</span>
-                <span class="contact-value">edutech@gmail.com</span>
-              </div>
-            </li>
-            <li>
-              <div class="contact-icon"><i class="fa-solid fa-headset"></i></div>
-              <div class="contact-text">
-                <span class="contact-label">Dukungan</span>
-                <span class="contact-value">Tersedia 24/7</span>
-              </div>
-            </li>
-            <li>
-              <div class="contact-icon"><i class="fa-solid fa-shield-halved"></i></div>
-              <div class="contact-text">
-                <span class="contact-label">Privasi</span>
-                <span class="contact-value">Data Anda terlindungi</span>
-              </div>
-            </li>
-          </ul>
-
-          <div class="fb-testimonial-seed">
-            <div class="fb-ts-quote"><i class="fa-solid fa-quote-left"></i></div>
-            <p>"Platform terbaik untuk belajar pemrograman web! Materinya terstruktur dan mudah dipahami."</p>
-            <div class="fb-ts-author">
-              <div class="feed-avatar fb-ts-avatar">AR</div>
-              <span>Ahmad Rizky &middot; <span class="fb-ts-stars">★★★★★</span></span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- RIGHT PANEL: Form Card -->
+        <!-- Form Card -->
         <div class="feedback-form-card">
 
           <div class="form-card-header">
@@ -1591,12 +1536,7 @@
       function renderTabContent() {
         const el = document.getElementById('tab-content');
         el.className = 'mt-6 vd-fade-up';
-
-        if (state.activeTab === 'about') el.innerHTML = tplAbout();
-        else if (state.activeTab === 'summary') el.innerHTML = tplSummary();
-        else if (state.activeTab === 'transcript') el.innerHTML = tplTranscript();
-        else if (state.activeTab === 'resource') el.innerHTML = tplResource();
-
+        el.innerHTML = tplAbout();
         if (window.lucide) window.lucide.createIcons();
       }
 
