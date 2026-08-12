@@ -1,28 +1,31 @@
 /* ==========================================================================
    AUDIO INTRO OVERLAY & FLOATING CONTROLLER
-   YouTube IFrame Player API Integration (Video ID: 6w6Cq3ZNUWk)
+   Dual Engine: HTML5 Audio + Web Audio Ambient Synth Fallback
    ========================================================================== */
 (function () {
-  const YT_VIDEO_ID = '6w6Cq3ZNUWk';
-
   // UI Elements - Overlay
-  const overlay   = document.getElementById('audio-overlay');
-  const btnEnter  = document.getElementById('ao-btn-enter');
-  const btnMute   = document.getElementById('ao-btn-mute');
+  const overlay = document.getElementById('audio-overlay');
+  const btnEnter = document.getElementById('ao-btn-enter');
+  const btnMute = document.getElementById('ao-btn-mute');
   const volSlider = document.getElementById('ao-volume');
-  const volRow    = document.getElementById('ao-volume-row');
-  const nowPlay   = document.getElementById('ao-now-playing');
+  const volRow = document.getElementById('ao-volume-row');
+  const nowPlay = document.getElementById('ao-now-playing');
   const particles = document.getElementById('ao-particles');
 
   // UI Elements - Floating Control (Top Right)
   const floatCtrl = document.getElementById('audio-floating-control');
-  const floatBtn  = document.getElementById('afc-btn-toggle');
-  const floatVol  = document.getElementById('afc-vol-slider');
+  const floatBtn = document.getElementById('afc-btn-toggle');
+  const floatVol = document.getElementById('afc-vol-slider');
 
-  let player = null;
-  let isYtReady = false;
   let isPlaying = false;
   let isMuted = false;
+  let audioEl = null;
+
+  // Web Audio Synth Fallback Variables
+  let audioCtx = null;
+  let masterGain = null;
+  let chordInterval = null;
+  let synthActive = false;
 
   // ── Floating Particles ──────────────────────────────────────────
   if (particles) {
@@ -32,56 +35,95 @@
       p.className = 'ao-particle';
       const x = Math.random() * 100;
       const delay = (Math.random() * 8).toFixed(2);
-      const dur   = (5 + Math.random() * 7).toFixed(2);
-      p.style.cssText = `left:${x}%;bottom:${Math.random()*20}%;--dur2:${dur}s;--delay:${delay}s;background:${COLORS[i % COLORS.length]}`;
+      const dur = (5 + Math.random() * 7).toFixed(2);
+      p.style.cssText = `left:${x}%;bottom:${Math.random() * 20}%;--dur2:${dur}s;--delay:${delay}s;background:${COLORS[i % COLORS.length]}`;
       particles.appendChild(p);
     }
   }
 
-  // ── Load YouTube IFrame API ──────────────────────────────────────
-  window.onYouTubeIframeAPIReady = function () {
-    player = new YT.Player('yt-player-element', {
-      height: '1',
-      width: '1',
-      videoId: YT_VIDEO_ID,
-      playerVars: {
-        autoplay: 0,
-        controls: 0,
-        loop: 1,
-        playlist: YT_VIDEO_ID,
-        playsinline: 1
-      },
-      events: {
-        onReady: function () {
-          isYtReady = true;
-          if (player) player.setVolume(parseInt(volSlider ? volSlider.value * 100 : 35));
-        },
-        onStateChange: function (e) {
-          if (e.data === YT.PlayerState.PLAYING) {
-            isPlaying = true;
-            if (floatCtrl) {
-              floatCtrl.classList.add('playing');
-              floatCtrl.classList.add('active');
-            }
-          } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
-            isPlaying = false;
-            if (floatCtrl) floatCtrl.classList.remove('playing');
-          }
-        }
-      }
-    });
-  };
-
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  const firstScriptTag = document.getElementsByTagName('script')[0];
-  if (firstScriptTag && firstScriptTag.parentNode) {
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  } else {
-    document.head.appendChild(tag);
+  // ── HTML5 Audio Setup ───────────────────────────────────────────
+  try {
+    audioEl = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3');
+    audioEl.loop = true;
+    audioEl.preload = 'auto';
+  } catch (e) {
+    console.warn('HTML5 Audio init fallback to Web Audio Synth');
   }
 
-  // ── Sync Floating Controller ────────────────────────────────────
+  // ── Web Audio Ambient Synthesizer (Fallback Engine) ─────────────
+  const CHORDS = [
+    [261.63, 329.63, 392.00, 493.88], // Cmaj7
+    [220.00, 261.63, 329.63, 392.00], // Am7
+    [174.61, 220.00, 261.63, 349.23], // Fmaj7
+    [196.00, 246.94, 293.66, 349.23]  // G7
+  ];
+
+  function initWebAudioSynth() {
+    if (audioCtx) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    audioCtx = new AudioContextClass();
+    masterGain = audioCtx.createGain();
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 550;
+
+    masterGain.connect(filter);
+    filter.connect(audioCtx.destination);
+  }
+
+  function playSynthChord() {
+    if (!audioCtx) initWebAudioSynth();
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const chordIndex = Math.floor(Math.random() * CHORDS.length);
+    const freqs = CHORDS[chordIndex];
+    const now = audioCtx.currentTime;
+
+    freqs.forEach(f => {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(0.035, now + 1.5);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 4.8);
+
+      osc.connect(g);
+      g.connect(masterGain);
+
+      osc.start(now);
+      osc.stop(now + 5.0);
+    });
+  }
+
+  function startSynthEngine() {
+    synthActive = true;
+    initWebAudioSynth();
+    playSynthChord();
+    if (chordInterval) clearInterval(chordInterval);
+    chordInterval = setInterval(playSynthChord, 4500);
+  }
+
+  function stopSynthEngine() {
+    synthActive = false;
+    if (chordInterval) clearInterval(chordInterval);
+    if (audioCtx && audioCtx.state === 'running') {
+      audioCtx.suspend();
+    }
+  }
+
+  // ── Unified Volume Controller ───────────────────────────────────
+  function setGlobalVolume(volVal) {
+    // volVal is 0.0 to 1.0
+    const clamped = Math.max(0, Math.min(1, volVal));
+    if (audioEl) audioEl.volume = clamped;
+    if (masterGain && audioCtx) masterGain.gain.value = clamped;
+  }
+
+  // ── Sync Floating Controller UI ────────────────────────────────
   function updateFloatBtnUI() {
     if (!floatBtn) return;
     const icon = floatBtn.querySelector('i');
@@ -97,13 +139,35 @@
   }
 
   function startMusic() {
-    if (player && isYtReady) {
-      player.setVolume(parseInt(volSlider.value * 100));
-      player.playVideo();
+    const currentVol = parseFloat(volSlider ? volSlider.value : 0.35);
+    setGlobalVolume(currentVol);
+
+    if (audioEl) {
+      audioEl.play().then(() => {
+        isPlaying = true;
+        isMuted = false;
+        updateFloatBtnUI();
+      }).catch(err => {
+        console.warn('HTML5 Audio play failed, falling back to Web Audio Synth:', err);
+        startSynthEngine();
+        isPlaying = true;
+        isMuted = false;
+        updateFloatBtnUI();
+      });
+    } else {
+      startSynthEngine();
       isPlaying = true;
       isMuted = false;
       updateFloatBtnUI();
     }
+  }
+
+  function pauseMusic() {
+    if (audioEl) audioEl.pause();
+    stopSynthEngine();
+    isPlaying = false;
+    isMuted = true;
+    updateFloatBtnUI();
   }
 
   function dismissOverlay() {
@@ -115,6 +179,7 @@
       if (floatCtrl) floatCtrl.classList.add('active');
     }, { once: true });
   }
+
   // ── Overlay Events ──────────────────────────────────────────────
   if (btnEnter) {
     btnEnter.addEventListener('click', () => {
@@ -123,7 +188,7 @@
       if (nowPlay) nowPlay.classList.add('visible');
       btnEnter.disabled = true;
       btnEnter.innerHTML = '<i class="fa-solid fa-check"></i> Menikmati musik...';
-      setTimeout(dismissOverlay, 1800);
+      setTimeout(dismissOverlay, 1500);
     });
   }
 
@@ -135,41 +200,33 @@
 
   if (volSlider) {
     volSlider.addEventListener('input', () => {
-      const volVal = parseInt(volSlider.value * 100);
-      if (player && isYtReady) player.setVolume(volVal);
-      if (floatVol) floatVol.value = volVal;
+      const volVal = parseFloat(volSlider.value);
+      setGlobalVolume(volVal);
+      if (floatVol) floatVol.value = Math.round(volVal * 100);
     });
   }
 
   // ── Floating Controller Events ──────────────────────────────────
   if (floatBtn) {
     floatBtn.addEventListener('click', () => {
-      if (!player || !isYtReady) return;
       if (isPlaying && !isMuted) {
-        player.pauseVideo();
-        isMuted = true;
+        pauseMusic();
       } else {
-        player.playVideo();
-        if (player.unMute) player.unMute();
-        isMuted = false;
+        startMusic();
       }
-      updateFloatBtnUI();
     });
   }
 
   if (floatVol) {
     floatVol.addEventListener('input', () => {
-      const volVal = parseInt(floatVol.value);
-      if (player && isYtReady) {
-        player.setVolume(volVal);
-        if (volVal === 0) {
-          isMuted = true;
-        } else if (isMuted) {
-          isMuted = false;
-          if (player.unMute) player.unMute();
-        }
+      const volVal = parseFloat(floatVol.value) / 100;
+      setGlobalVolume(volVal);
+      if (volVal === 0) {
+        isMuted = true;
+      } else if (isMuted) {
+        isMuted = false;
       }
-      if (volSlider) volSlider.value = volVal / 100;
+      if (volSlider) volSlider.value = volVal;
       updateFloatBtnUI();
     });
   }
