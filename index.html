@@ -1361,7 +1361,7 @@
 
       const VIDEO = {
         // Ganti dengan ID video YouTube asli. Thumbnail facade otomatis mengikuti ID ini.
-        youtubeId: 'jfKfPfyJRdk',
+        youtubeId: 'B03bWuLzLbU',
         title: '[Vlog Presentasi UAS Pemrograman Web I] - EduTech: Platform Pembelajaran Teknologi Modern',
         description:
           'Video ini berisi dokumentasi pengerjaan, demonstrasi fitur, serta penjelasan arsitektur source code aplikasi web EduTech. Web ini dikembangkan sebagai platform edukasi digital modern yang menyajikan modul interaktif dan katalog pembelajaran teknologi.',
@@ -1453,13 +1453,13 @@
 
         if (state.hasPlayed) {
           const src =
-            'https://www.youtube.com/embed/' + VIDEO.youtubeId +
+            'https://www.youtube-nocookie.com/embed/' + VIDEO.youtubeId +
             '?rel=0&modestbranding=1&autoplay=1' +
             (state.startAt ? '&start=' + state.startAt : '');
 
           wrapper.innerHTML =
             '<iframe src="' + src + '" title="' + escapeHtml(VIDEO.title) + '" ' +
-            'class="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            'class="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
           return;
         }
 
